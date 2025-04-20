@@ -139,3 +139,7 @@ export const loginSchema = z.object({
 export const getUserByEmailSchema = z.object({
   email: z.string().email({ message: 'Email inválido' })
 });
+
+export const deleteUserSchema = z.object({
+  email: z.string().email({ message: "Email inválido" })
+});
