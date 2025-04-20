@@ -3,6 +3,39 @@ import bcrypt from 'bcryptjs';
 import { createAccessToken } from "../libs/jwt.js";
 import jwt from "jsonwebtoken";
 import { TOKEN_SECRET } from "../config.js";
+//getuser by email
+export const getUserByEmail = async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.json({
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      phone: user.phone,
+      photo: user.photo,
+      bankAccount: user.bankAccount,
+      weight: user.weight,
+      height: user.height,
+      classesCanTeach: user.classesCanTeach,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 //modificar user
 export const updateUser = async (req, res) => {
   try {

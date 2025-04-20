@@ -11,7 +11,7 @@ export const updateSchema = z.object({
   bankAccount: z.string().optional(),
   weight: z.number().optional(),
   height: z.number().optional(),
-
+ 
   // Campos específicos para entrenadores
   classesCanTeach: z.array(z.string()).optional()
 }).superRefine((data, ctx) => {
@@ -136,3 +136,6 @@ export const loginSchema = z.object({
   }),
 });
 
+export const getUserByEmailSchema = z.object({
+  email: z.string().email({ message: 'Email inválido' })
+});
