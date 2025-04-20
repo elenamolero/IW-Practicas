@@ -3,7 +3,42 @@ import bcrypt from 'bcryptjs';
 import { createAccessToken } from "../libs/jwt.js";
 import jwt from "jsonwebtoken";
 import { TOKEN_SECRET } from "../config.js";
+//modificar user
+export const updateUser = async (req, res) => {
+  try {
+    const { email, _id, id, ...updateData } = req.body;
 
+    if (!email) return res.status(400).json({ message: "Se requiere el email para identificar al usuario" });
+
+    // Buscar al usuario por su email
+    const userFound = await User.findOne({ email });
+    if (!userFound) return res.status(404).json({ message: "Usuario no encontrado" });
+
+    // Actualizar datos (sin modificar email ni id)
+    const userUpdated = await User.findByIdAndUpdate(userFound._id, updateData, {
+      new: true,
+      runValidators: true
+    });
+
+    res.json({
+      id: userUpdated._id,
+      email: userUpdated.email,
+      firstName: userUpdated.firstName,
+      lastName: userUpdated.lastName,
+      role: userUpdated.role,
+      phone: userUpdated.phone,
+      photo: userUpdated.photo,
+      bankAccount: userUpdated.bankAccount,
+      weight: userUpdated.weight,
+      height: userUpdated.height,
+      classesCanTeach: userUpdated.classesCanTeach,
+      createdAt: userUpdated.createdAt,
+      updatedAt: userUpdated.updatedAt,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 // REGISTRO
 export const register = async (req, res) => {
     const {
