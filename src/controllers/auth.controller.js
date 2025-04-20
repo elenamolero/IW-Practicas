@@ -144,7 +144,8 @@ export const register = async (req, res) => {
       });
   
       const userSaved = await newUser.save();
-      const token = await createAccessToken({ id: userSaved._id });
+      const token = await createAccessToken({ id: userSaved._id, role: userSaved.role });
+
   
       res.cookie('token', token, { httpOnly: true });
       res.json({
@@ -180,7 +181,8 @@ export const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, userFound.password);
     if (!isMatch) return res.status(400).json({ message: "Contraseña incorrecta" });
 
-    const token = await createAccessToken({ id: userFound._id });
+    const token = await createAccessToken({ id: userFound._id, role: userFound.role });
+
 
     res.cookie('token', token, { httpOnly: true });
     res.json({
