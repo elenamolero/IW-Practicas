@@ -3,6 +3,24 @@ import bcrypt from 'bcryptjs';
 import { createAccessToken } from "../libs/jwt.js";
 import jwt from "jsonwebtoken";
 import { TOKEN_SECRET } from "../config.js";
+
+// delete user
+export const deleteUser = async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    const userFound = await User.findOneAndDelete({ email });
+
+    if (!userFound) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.json({ message: `Usuario con email ${email} eliminado correctamente.` });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 //getuser by email
 export const getUserByEmail = async (req, res) => {
   const { email } = req.params;
