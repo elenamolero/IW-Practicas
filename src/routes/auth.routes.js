@@ -9,8 +9,6 @@ const router =Router();
 
 router.post(
     '/register',
-    authRequired,
-    requireRole(['entrenador', 'socio']), //el admin padre puede crear nuevos entrenadores y los socios se pueden registrar solos
     validateSchema(registerSchema),
     register);
 router.put(

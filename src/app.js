@@ -3,6 +3,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import authRoutes from "./routes/auth.routes.js";
 import taskRoutes from "./routes/tasks.routes.js";
+import groupClassRoutes from "./routes/groupClass.routes.js";
 import cors from 'cors';
 
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api',authRoutes);
+app.use('/api',groupClassRoutes);
 app.use('/api',taskRoutes);
 
 export default app;
