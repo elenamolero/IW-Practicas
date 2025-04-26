@@ -5,45 +5,45 @@ export const updateSchema = z.object({
   lastName: z.string().optional(),
   phone: z.string().optional(),
   photo: z.string().optional(),
-  role: z.enum(['socio', 'entrenador']).optional(),
+  role: z.enum(['member', 'trainer']).optional(),
 
-  // Campos específicos para socios
+  // Campos específicos para members
   bankAccount: z.string().optional(),
   weight: z.number().optional(),
   height: z.number().optional(),
  
-  // Campos específicos para entrenadores
+  // Campos específicos para traineres
   classesCanTeach: z.array(z.string()).optional()
 }).superRefine((data, ctx) => {
-  if (data.role === 'socio') {
+  if (data.role === 'member') {
     if (!data.bankAccount) {
       ctx.addIssue({
         path: ['bankAccount'],
-        message: 'La cuenta bancaria es requerida para socios',
+        message: 'La cuenta bancaria es requerida para members',
         code: z.ZodIssueCode.custom
       });
     }
     if (typeof data.weight !== 'number') {
       ctx.addIssue({
         path: ['weight'],
-        message: 'El peso es requerido para socios',
+        message: 'El peso es requerido para members',
         code: z.ZodIssueCode.custom
       });
     }
     if (typeof data.height !== 'number') {
       ctx.addIssue({
         path: ['height'],
-        message: 'La altura es requerida para socios',
+        message: 'La altura es requerida para members',
         code: z.ZodIssueCode.custom
       });
     }
   }
 
-  if (data.role === 'entrenador') {
+  if (data.role === 'trainer') {
     if (!data.classesCanTeach || data.classesCanTeach.length === 0) {
       ctx.addIssue({
         path: ['classesCanTeach'],
-        message: 'Debe indicar al menos una clase que puede impartir el entrenador',
+        message: 'Debe indicar al menos una clase que puede impartir el trainer',
         code: z.ZodIssueCode.custom
       });
     }
@@ -75,47 +75,47 @@ export const registerSchema = z.object({
 
   photo: z.string().optional(),
 
-  role: z.enum(['socio', 'entrenador'], {
+  role: z.enum(['member', 'trainer'], {
     required_error: 'El rol es requerido',
   }),
 
-  // Solo para socios
+  // Solo para members
   bankAccount: z.string().optional(),
   weight: z.number().optional(),
   height: z.number().optional(),
 
-  // Solo para entrenadores
+  // Solo para traineres
   classesCanTeach: z.array(z.string()).optional()
 }).superRefine((data, ctx) => {
-  if (data.role === 'socio') {
+  if (data.role === 'member') {
     if (!data.bankAccount) {
       ctx.addIssue({
         path: ['bankAccount'],
-        message: 'La cuenta bancaria es requerida para socios',
+        message: 'La cuenta bancaria es requerida para members',
         code: z.ZodIssueCode.custom
       });
     }
     if (typeof data.weight !== 'number') {
       ctx.addIssue({
         path: ['weight'],
-        message: 'El peso es requerido para socios',
+        message: 'El peso es requerido para members',
         code: z.ZodIssueCode.custom
       });
     }
     if (typeof data.height !== 'number') {
       ctx.addIssue({
         path: ['height'],
-        message: 'La altura es requerida para socios',
+        message: 'La altura es requerida para members',
         code: z.ZodIssueCode.custom
       });
     }
   }
 
-  if (data.role === 'entrenador') {
+  if (data.role === 'trainer') {
     if (!data.classesCanTeach || data.classesCanTeach.length === 0) {
       ctx.addIssue({
         path: ['classesCanTeach'],
-        message: 'Debe indicar al menos una clase que puede impartir el entrenador',
+        message: 'Debe indicar al menos una clase que puede impartir el trainer',
         code: z.ZodIssueCode.custom
       });
     }

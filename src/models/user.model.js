@@ -32,31 +32,31 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['socio', 'entrenador'], 
+    enum: ['member', 'trainer'], 
     required: true
   },
   bankAccount: {
     type: String,
     required: function () {
-      return this.role === 'socio';
+      return this.role === 'member';
     }
   },
   weight: {
     type: Number,
     required: function () {
-      return this.role === 'socio';
+      return this.role === 'trainer';
     }
   },
   height: {
     type: Number,
     required: function () {
-      return this.role === 'socio';
+      return this.role === 'member';
     }
   },
   classesCanTeach: {
     type: [String], // lista de clases que puede impartir
     required: function () {
-      return this.role === 'entrenador';
+      return this.role === 'trainer';
     }
   }
 
