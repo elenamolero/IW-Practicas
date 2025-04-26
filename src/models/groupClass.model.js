@@ -18,7 +18,7 @@ const groupClassSchema = new mongoose.Schema({
   attendees: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User' // referencing registered users (socios)
+      ref: 'User' // referencing registered users (members)
     }
   ],
   difficultyLevel: {

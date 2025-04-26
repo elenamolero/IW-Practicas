@@ -7,6 +7,7 @@ import { registerSchema,loginSchema, updateSchema, getUserByEmailSchema, deleteU
 
 const router =Router();
 
+
 router.post(
     '/register',
     validateSchema(registerSchema),
@@ -14,26 +15,24 @@ router.post(
 router.put(
     '/update',
     authRequired,
-    requireRole(['entrenador', 'socio']), 
+    requireRole(['trainer', 'member']), 
     validateSchema(updateSchema),
     updateUser);
 router.get(
     '/get-user-by-email/:email', 
     authRequired,
-    requireRole(['entrenador', 'socio']), 
+    requireRole(['trainer', 'member']), 
     validateSchema(getUserByEmailSchema, 'params'), 
     getUserByEmail);
 router.delete(
     '/delete-user/:email',
     authRequired,
-    requireRole(['entrenador', 'socio']), // el socio puede cancelar la suscripción y el entrenador puede eliminar a los demás usuarios
+    requireRole(['trainer', 'member']), // el member puede cancelar la suscripción y el trainer puede eliminar a los demás usuarios
     validateSchema(deleteUserSchema, 'params'),
     deleteUser
   );
 router.post(
     '/login',
-    authRequired,
-    requireRole(['entrenador', 'socio']),
     validateSchema(loginSchema),
     login);
 router.post('/logout',logout);
