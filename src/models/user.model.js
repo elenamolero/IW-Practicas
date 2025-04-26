@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
   weight: {
     type: Number,
     required: function () {
-      return this.role === 'trainer';
+      return this.role === 'member';
     }
   },
   height: {
