@@ -44,6 +44,11 @@ export const createWorkout = async (req, res) => {
         message: "A workout with the same date and order already exists."
       });
     }
+    if (user.role !== "member") {
+        return res.status(400).json({
+          message: "The user associated with this workout must have the role of 'member'."
+        });
+      }
     const newWorkout = new Workout({
       title,
       user_id,
