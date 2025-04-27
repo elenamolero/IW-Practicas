@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createGroupClass, cancelGroupClass, updateGroupClass } from '../controllers/groupClass.controller.js';
+import { createGroupClass, cancelGroupClass, updateGroupClass, getGroupClassDetails } from '../controllers/groupClass.controller.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { createClassSchema, updateClassSchema } from '../Schemas/groupClass.schema.js';
 import { authRequired } from '../Middlewares/validateToken.js';
@@ -9,9 +9,9 @@ const router = Router();
 
 router.post(
   '/create-group-class',
-  //authRequired,
-  //requireRole(['trainer']), // only trainers can create classes
-  //validateSchema(createClassSchema),
+  authRequired,
+  requireRole(['trainer']), // only trainers can create classes
+  validateSchema(createClassSchema),
   createGroupClass
 );
 
@@ -28,6 +28,12 @@ router.put(
   requireRole(['trainer']), // only trainers can update classes
   validateSchema(updateClassSchema),
   updateGroupClass
+);
+
+router.get(
+  '/group-class-details/:classId',
+  authRequired,
+  getGroupClassDetails
 );
 
 export default router;

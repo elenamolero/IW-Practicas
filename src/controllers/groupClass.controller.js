@@ -233,3 +233,30 @@ export const updateGroupClass = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+export const getGroupClassDetails = async (req, res) => {
+  try {
+    const { classId } = req.params;
+
+    // Buscar la clase por su ID
+    const groupClass = await GroupClass.findById(classId)
+      .populate('assignedTrainer', 'name email') // opcional: incluir nombre y email del entrenador
+      .populate('attendees', 'name email'); // opcional: incluir nombre y email de los asistentes
+
+    if (!groupClass) {
+      return res.status(404).json({
+        message: "Clase grupal no encontrada"
+      });
+    }
+
+    res.json({
+      message: "Detalles de la clase grupal",
+      class: groupClass
+    });
+
+  } catch (error) {
+    console.error("Error al obtener detalles de la clase: ", error);
+    res.status(500).json({ message: error.message });
+  }
+};
