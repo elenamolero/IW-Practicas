@@ -298,3 +298,24 @@ export const reserveGroupClass = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+export const deleteGroupClass = async (req, res) => {
+  try {
+    const { classId } = req.params;
+
+    const groupClass = await GroupClass.findById(classId);
+    if (!groupClass) {
+      return res.status(404).json({ message: "Clase grupal no encontrada" });
+    }
+
+    // Opcional: Si quieres que solo Admins puedan eliminar directamente, aquí podrías meter un check extra de rol.
+
+    await GroupClass.findByIdAndDelete(classId);
+
+    res.status(200).json({ message: "Clase grupal eliminada correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar la clase grupal: ", error);
+    res.status(500).json({ message: error.message });
+  }
+};
