@@ -1,9 +1,14 @@
 import mongoose from "mongoose";
 
-const bodybuildingReserveSchema = new mongoose.Schema({
+const muscleRoomReserveSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+    required: true
+  },
+  muscleRoom: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MuscleRoom',
     required: true
   },
   date: {
@@ -18,10 +23,10 @@ const bodybuildingReserveSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  equipment: {
-    type: String,
+  numberOfPeople: {
+    type: Number,
     required: true,
-    enum: ['press', 'squat', 'deadlift', 'bench', 'other']
+    min: 1
   },
   status: {
     type: String,
@@ -37,6 +42,6 @@ const bodybuildingReserveSchema = new mongoose.Schema({
 });
 
 // Índice para evitar reservas duplicadas en el mismo horario
-bodybuildingReserveSchema.index({ date: 1, startTime: 1, endTime: 1, equipment: 1 }, { unique: true });
+muscleRoomReserveSchema.index({ muscleRoom: 1, date: 1, startTime: 1, endTime: 1 }, { unique: true });
 
-export default mongoose.model('BodybuildingReserve', bodybuildingReserveSchema);
+export default mongoose.model('MuscleRoomReserve', muscleRoomReserveSchema); 
