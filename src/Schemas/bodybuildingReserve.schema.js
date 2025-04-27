@@ -1,10 +1,6 @@
 import { z } from 'zod';
 
-export const createMuscleRoomReserveSchema = z.object({
-  muscleRoom: z.string({
-    required_error: 'El ID de la sala es requerido',
-  }),
-
+export const createBodybuildingReserveSchema = z.object({
   date: z.string({
     required_error: 'La fecha es requerida',
   }),
@@ -21,10 +17,8 @@ export const createMuscleRoomReserveSchema = z.object({
     message: 'El formato de hora debe ser HH:MM',
   }),
 
-  numberOfPeople: z.number({
-    required_error: 'El número de personas es requerido',
-  }).min(1, {
-    message: 'El número de personas debe ser al menos 1',
+  equipment: z.enum(['press', 'squat', 'deadlift', 'bench', 'other'], {
+    required_error: 'El equipo es requerido',
   }),
 
   notes: z.string().optional(),
@@ -42,7 +36,7 @@ export const createMuscleRoomReserveSchema = z.object({
   path: ["endTime"],
 });
 
-export const updateMuscleRoomReserveSchema = z.object({
+export const updateBodybuildingReserveSchema = z.object({
   date: z.string().optional(),
   startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: 'El formato de hora debe ser HH:MM',
@@ -50,7 +44,7 @@ export const updateMuscleRoomReserveSchema = z.object({
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: 'El formato de hora debe ser HH:MM',
   }).optional(),
-  numberOfPeople: z.number().min(1).optional(),
+  equipment: z.enum(['press', 'squat', 'deadlift', 'bench', 'other']).optional(),
   status: z.enum(['pending', 'confirmed', 'cancelled', 'completed']).optional(),
   notes: z.string().optional(),
 }).refine((data) => {
