@@ -5,7 +5,7 @@ import MuscleRoom from "../models/muscleRoom.model.js";
 export const createMuscleRoomReserve = async (req, res) => {
   try {
     const { muscleRoom, date, startTime, endTime, numberOfPeople, notes } = req.body;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     // Verificar si la sala existe y está disponible
     const room = await MuscleRoom.findById(muscleRoom);
@@ -72,7 +72,7 @@ export const createMuscleRoomReserve = async (req, res) => {
 // Obtener todas las reservas del usuario
 export const getUserReserves = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     
     const reserves = await MuscleRoomReserve.find({ user: userId })
       .populate('muscleRoom', 'name capacity')
@@ -89,7 +89,7 @@ export const getUserReserves = async (req, res) => {
 export const getReserveById = async (req, res) => {
   try {
     const { reserveId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.id;
     
     const reserve = await MuscleRoomReserve.findOne({
       _id: reserveId,
@@ -113,7 +113,7 @@ export const getReserveById = async (req, res) => {
 export const updateReserve = async (req, res) => {
   try {
     const { reserveId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.id;
     const { date, startTime, endTime, numberOfPeople, notes, status } = req.body;
     
     // Verificar si la reserva existe y pertenece al usuario
@@ -185,7 +185,7 @@ export const updateReserve = async (req, res) => {
 export const cancelReserve = async (req, res) => {
   try {
     const { reserveId } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.id;
     
     // Verificar si la reserva existe y pertenece al usuario
     const reserve = await MuscleRoomReserve.findOne({

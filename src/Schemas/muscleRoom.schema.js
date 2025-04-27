@@ -2,13 +2,13 @@ import { z } from 'zod';
 
 export const createMuscleRoomSchema = z.object({
   name: z.string({
-    required_error: 'El nombre de la sala es requerido',
+    required_error: 'El nombre es requerido',
   }),
 
   capacity: z.number({
     required_error: 'La capacidad es requerida',
   }).min(1, {
-    message: 'La capacidad debe ser al menos 1 persona',
+    message: 'La capacidad debe ser al menos 1',
   }),
 
   description: z.string().optional(),
