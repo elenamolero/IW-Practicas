@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const gymReservationSchema = new mongoose.Schema({
+const bodybuildingReserveSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -10,12 +10,33 @@ const gymReservationSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  timeSlot: {
-    type: String, // ejemplo: "18:00-19:00"
+  startTime: {
+    type: String,
     required: true
+  },
+  endTime: {
+    type: String,
+    required: true
+  },
+  equipment: {
+    type: String,
+    required: true,
+    enum: ['press', 'squat', 'deadlift', 'bench', 'other']
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'confirmed', 'cancelled', 'completed'],
+    default: 'pending'
+  },
+  notes: {
+    type: String,
+    required: false
   }
 }, {
   timestamps: true
 });
 
-export default mongoose.model('GymReservation', gymReservationSchema);
+// Índice para evitar reservas duplicadas en el mismo horario
+bodybuildingReserveSchema.index({ date: 1, startTime: 1, endTime: 1, equipment: 1 }, { unique: true });
+
+export default mongoose.model('BodybuildingReserve', bodybuildingReserveSchema);

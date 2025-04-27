@@ -26,14 +26,14 @@ router.get(
     getUserByEmail);
 router.delete(
     '/delete-user/:email',
-    authRequired,
-    requireRole(['trainer', 'member']), // el member puede cancelar la suscripción y el trainer puede eliminar a los demás usuarios
-    validateSchema(deleteUserSchema, 'params'),
+    //authRequired,
+    //requireRole(['trainer', 'member']), // el member puede cancelar la suscripción y el trainer puede eliminar a los demás usuarios
+    //validateSchema(deleteUserSchema, 'params'),
     deleteUser
   );
 router.post(
     '/login',
-    validateSchema(loginSchema),
+    //validateSchema(loginSchema),
     login);
 router.post('/logout',logout);
 router.get('/profile',verifyToken);

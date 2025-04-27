@@ -25,3 +25,11 @@ export const createClassSchema = z.object({
 
   attendees: z.array(z.string()).optional(), // Array of user IDs (optional when creating)
 });
+
+export const updateClassSchema = z.object({
+  name: z.string().optional(),
+  schedule: z.string().optional(),
+  maxCapacity: z.number().min(1).optional(),
+  difficultyLevel: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+  attendees: z.array(z.string()).optional(),
+});
