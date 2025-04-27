@@ -1,15 +1,10 @@
 import { z } from 'zod';
 
 export const createWorkoutSchema = z.object({
-  title: z.string({
-    required_error: 'Workout title is required',
+  workoutTypeId: z.string({
+    required_error: 'WorkoutTypeId is required',
   }),
-
-  user_id: z.string({
-    required_error: 'User ID is required',
-  }),
-
-  description: z.string().optional(), // Description is optional
+  
   date: z.string({
     required_error: 'Workout date is required',
   }),
@@ -45,6 +40,34 @@ export const createWorkoutSchema = z.object({
   }).max(10, {
     message: 'Intensity cannot exceed 10',
   }),
+});
+
+export const updateWorkoutSchema = z.object({
+  workoutTypeId: z.string().optional(),
+  
+  date: z.string().optional(),
+
+  series: z.number().min(1, {
+    message: 'Series must be at least 1',
+  }).optional(),
+
+  repetitions: z.number().min(1, {
+    message: 'Repetitions must be at least 1',
+  }).optional(),
+
+  rest: z.number().min(0, {
+    message: 'Rest time cannot be negative',
+  }).optional(),
+
+  order: z.number().min(1, {
+    message: 'Order must be at least 1',
+  }).optional(),
+
+  intensity: z.number().min(1, {
+    message: 'Intensity must be at least 1',
+  }).max(10, {
+    message: 'Intensity cannot exceed 10',
+  }).optional(),
 });
 
 export default createWorkoutSchema;
