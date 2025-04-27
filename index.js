@@ -3,7 +3,9 @@ import app from './src/app.js';
 import { connectDb } from './src/db.js';
 
 await connectDb();
-
+app.get('/', (req, res) => {
+    res.send('¡Servidor funcionando!');
+  });
 //const app=express()
 //export default app;
 app.listen(4000)

@@ -108,3 +108,43 @@ export const createGroupClass = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const cancelGroupClass = async (req, res) => {
+  try {
+    const { classId } = req.params;
+
+    // Verificar si la clase existe
+    const groupClass = await GroupClass.findById(classId);
+    if (!groupClass) {
+      return res.status(404).json({
+        message: "Clase grupal no encontrada"
+      });
+    }
+
+    // Verificar si el usuario que intenta cancelar es el entrenador asignado
+    if (groupClass.assignedTrainer.toString() !== req.user.id) {
+      return res.status(403).json({
+        message: "Solo el entrenador asignado puede cancelar la clase"
+      });
+    }
+
+    // Verificar si la clase ya ha pasado
+    const now = new Date();
+    if (groupClass.schedule < now) {
+      return res.status(400).json({
+        message: "No se puede cancelar una clase que ya ha pasado"
+      });
+    }
+
+    // Eliminar la clase
+    await GroupClass.findByIdAndDelete(classId);
+
+    res.json({
+      message: "Clase grupal cancelada exitosamente"
+    });
+
+  } catch (error) {
+    console.error("Error al cancelar la clase: ", error);
+    res.status(500).json({ message: error.message });
+  }
+};
