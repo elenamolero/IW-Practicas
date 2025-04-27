@@ -260,3 +260,41 @@ export const getGroupClassDetails = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+export const reserveGroupClass = async (req, res) => {
+  try {
+    const { classId } = req.params; // ID de la clase grupal
+
+    // Buscar la clase
+    const groupClass = await GroupClass.findById(classId);
+    if (!groupClass) {
+      return res.status(404).json({ message: "Clase grupal no encontrada" });
+    }
+
+    // Verificar si la clase ya pasó
+    const now = new Date();
+    if (groupClass.schedule < now) {
+      return res.status(400).json({ message: "No se puede reservar una clase que ya ha pasado" });
+    }
+
+    // Verificar si ya está inscrito
+    if (groupClass.attendees.includes(req.user.id)) {
+      return res.status(400).json({ message: "Ya estás inscrito en esta clase" });
+    }
+
+    // Verificar si hay espacio disponible
+    if (groupClass.attendees.length >= groupClass.maxCapacity) {
+      return res.status(400).json({ message: "La clase ya está completa" });
+    }
+
+    // Añadir al usuario a la lista de asistentes
+    groupClass.attendees.push(req.user.id);
+    await groupClass.save();
+
+    res.status(200).json({ message: "Reserva realizada con éxito", class: groupClass });
+  } catch (error) {
+    console.error("Error al reservar clase grupal: ", error);
+    res.status(500).json({ message: error.message });
+  }
+};

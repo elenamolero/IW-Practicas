@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createGroupClass, cancelGroupClass, updateGroupClass, getGroupClassDetails } from '../controllers/groupClass.controller.js';
+import { createGroupClass, cancelGroupClass, updateGroupClass, getGroupClassDetails, reserveGroupClass } from '../controllers/groupClass.controller.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { createClassSchema, updateClassSchema } from '../Schemas/groupClass.schema.js';
 import { authRequired } from '../Middlewares/validateToken.js';
@@ -34,6 +34,12 @@ router.get(
   '/group-class-details/:classId',
   authRequired,
   getGroupClassDetails
+);
+
+router.post(
+  '/reserve-group-class/:classId',
+  authRequired, // cualquier usuario logueado puede reservar
+  reserveGroupClass
 );
 
 export default router;
