@@ -9,9 +9,9 @@ const router = Router();
 
 router.post(
   '/create-group-class',
-  //authRequired,
-  //requireRole(['trainer']), // only trainers can create classes
-  //validateSchema(createClassSchema),
+  authRequired,
+  requireRole(['trainer']), // only trainers can create classes
+  validateSchema(createClassSchema),
   createGroupClass
 );
 
