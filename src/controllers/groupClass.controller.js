@@ -128,3 +128,108 @@ export const cancelGroupClass = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const updateGroupClass = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const {
+      name,
+      schedule,
+      maxCapacity,
+      difficultyLevel,
+      attendees
+    } = req.body;
+
+    // Verificar si la clase existe
+    const groupClass = await GroupClass.findById(classId);
+    if (!groupClass) {
+      return res.status(404).json({
+        message: "Clase grupal no encontrada"
+      });
+    }
+
+    // Verificar si el usuario que intenta modificar es el entrenador asignado
+    if (groupClass.assignedTrainer.toString() !== req.user.id) {
+      return res.status(403).json({
+        message: "Solo el entrenador asignado puede modificar la clase"
+      });
+    }
+
+    // Verificar si la clase ya ha pasado
+    const now = new Date();
+    if (groupClass.schedule < now) {
+      return res.status(400).json({
+        message: "No se puede modificar una clase que ya ha pasado"
+      });
+    }
+
+    // Validar la fecha si se proporciona
+    if (schedule) {
+      const classSchedule = new Date(schedule);
+      if (isNaN(classSchedule.getTime())) {
+        return res.status(400).json({
+          message: "El horario no es válido. Formato esperado: YYYY-MM-DDTHH:mm:ss"
+        });
+      }
+
+      // Verificar solapamiento con otras clases
+      const classEndTime = new Date(classSchedule.getTime() + 60 * 60 * 1000);
+      const existingClasses = await GroupClass.find({
+        _id: { $ne: classId } // Excluir la clase actual
+      });
+
+      const overlappingClass = existingClasses.find(existingClass => {
+        const existingClassEndTime = new Date(existingClass.schedule.getTime() + 60 * 60 * 1000);
+        return (
+          (classSchedule < existingClassEndTime && classEndTime > existingClass.schedule) ||
+          (classSchedule >= existingClass.schedule && classSchedule < existingClassEndTime)
+        );
+      });
+
+      if (overlappingClass) {
+        return res.status(400).json({
+          message: "Ya existe una clase en esa franja horaria"
+        });
+      }
+    }
+
+    // Validar el nivel de dificultad si se proporciona
+    if (difficultyLevel) {
+      const validDifficultyLevels = ['beginner', 'intermediate', 'advanced'];
+      if (!validDifficultyLevels.includes(difficultyLevel)) {
+        return res.status(400).json({
+          message: "El nivel de dificultad debe ser uno de los siguientes: 'beginner', 'intermediate', 'advanced'"
+        });
+      }
+    }
+
+    // Validar la capacidad máxima si se proporciona
+    if (maxCapacity && isNaN(maxCapacity)) {
+      return res.status(400).json({
+        message: "La capacidad máxima debe ser un número válido"
+      });
+    }
+
+    // Actualizar la clase
+    const updatedClass = await GroupClass.findByIdAndUpdate(
+      classId,
+      {
+        name: name || groupClass.name,
+        schedule: schedule ? new Date(schedule) : groupClass.schedule,
+        maxCapacity: maxCapacity || groupClass.maxCapacity,
+        difficultyLevel: difficultyLevel || groupClass.difficultyLevel,
+        attendees: attendees || groupClass.attendees
+      },
+      { new: true }
+    );
+
+    res.json({
+      message: "Clase grupal actualizada exitosamente",
+      class: updatedClass
+    });
+
+  } catch (error) {
+    console.error("Error al modificar la clase: ", error);
+    res.status(500).json({ message: error.message });
+  }
+};

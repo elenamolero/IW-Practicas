@@ -2,7 +2,6 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import authRoutes from "./routes/auth.routes.js";
-import taskRoutes from "./routes/tasks.routes.js";
 import groupClassRoutes from "./routes/groupClass.routes.js";
 import workoutRoutes from "./routes/workout.routes.js";
 import cors from 'cors';
@@ -19,7 +18,6 @@ app.use(cookieParser());
 
 app.use('/api',authRoutes);
 app.use('/api',groupClassRoutes);
-app.use('/api',taskRoutes);
 app.use('/api',workoutRoutes);
 
 export default app;
