@@ -91,84 +91,67 @@ export const updateUser = async (req, res) => {
   }
 };
 // REGISTRO
+
+
 export const register = async (req, res) => {
+  try {
     const {
       email,
       password,
       firstName,
       lastName,
       phone,
-      photo,
       role,
       bankAccount,
       weight,
       height,
-      classesCanTeach
+      classesCanTeach,
+      photo, // Aceptar la URL de la foto desde el cuerpo
     } = req.body;
-  
-    try {
-      const userFound = await User.findOne({ email });
-      if (userFound) return res.status(400).json(['El email ya está en uso']);
-  
-      // Validaciones según el rol
-      if (role === "member") {
-        if (!bankAccount || !weight || !height) {
-          return res.status(400).json({
-            message: "Los campos cuenta bancaria, peso y altura son obligatorios para los members."
-          });
-        }
-      }
-  
-      if (role === "trainer") {
-        if (!classesCanTeach || classesCanTeach.length === 0) {
-          return res.status(400).json({
-            message: "Las clases que puede impartir son obligatorias para traineres."
-          });
-        }
-      }
-  
-      const passwordHash = await bcrypt.hash(password, 10);
-  
-      const newUser = new User({
-        email,
-        password: passwordHash,
-        firstName,
-        lastName,
-        phone,
-        photo,
-        role,
-        bankAccount: role === "member" ? bankAccount : undefined,
-        weight: role === "member" ? weight : undefined,
-        height: role === "member" ? height : undefined,
-        classesCanTeach: role === "trainer" ? classesCanTeach : undefined
-      });
-  
-      const userSaved = await newUser.save();
-      const token = await createAccessToken({ id: userSaved._id, role: userSaved.role });
 
-  
-      res.cookie('token', token, { httpOnly: true });
-      res.json({
-        id: userSaved._id,
-        email: userSaved.email,
-        firstName: userSaved.firstName,
-        lastName: userSaved.lastName,
-        role: userSaved.role,
-        createdAt: userSaved.createdAt,
-        updatedAt: userSaved.updatedAt,
-        phone: userSaved.phone,
-        photo: userSaved.photo,
-        bankAccount: userSaved.bankAccount,
-        weight: userSaved.weight,
-        height: userSaved.height,
-        classesCanTeach: userSaved.classesCanTeach
-      });
-  
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+    const userFound = await User.findOne({ email });
+    if (userFound) return res.status(400).json(['El email ya está en uso']);
+
+    // Subir la foto si se envía como archivo
+    let photoUrl = photo || null; // Usar la URL del cuerpo si no se sube un archivo
+    if (req.file) {
+      photoUrl = req.file.path; // URL de la foto subida a Cloudinary
     }
-  };
-  
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      email,
+      password: passwordHash,
+      firstName,
+      lastName,
+      phone,
+      photo: photoUrl, // Guardar la URL de la foto
+      role,
+      bankAccount: role === 'member' ? bankAccount : undefined,
+      weight: role === 'member' ? weight : undefined,
+      height: role === 'member' ? height : undefined,
+      classesCanTeach: role === 'trainer' ? classesCanTeach : undefined,
+    });
+
+    const userSaved = await newUser.save();
+    const token = await createAccessToken({ id: userSaved._id, role: userSaved.role });
+
+    res.cookie('token', token, { httpOnly: true });
+    res.json({
+      id: userSaved._id,
+      email: userSaved.email,
+      firstName: userSaved.firstName,
+      lastName: userSaved.lastName,
+      role: userSaved.role,
+      photo: userSaved.photo, // URL de la foto
+      createdAt: userSaved.createdAt,
+      updatedAt: userSaved.updatedAt,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // LOGIN
 export const login = async (req, res) => {
