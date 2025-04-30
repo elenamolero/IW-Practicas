@@ -3,6 +3,7 @@ import {login,register,logout,profile,verifyToken, updateUser, getUserByEmail, d
 import { authRequired } from '../Middlewares/validateToken.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { requireRole } from '../Middlewares/requireRole.middleware.js';
+import upload from '../Middlewares/upload.middleware.js';
 import { registerSchema,loginSchema, updateSchema, getUserByEmailSchema, deleteUserSchema } from '../Schemas/auth.schema.js';
 
 const router =Router();
@@ -10,6 +11,7 @@ const router =Router();
 
 router.post(
     '/register',
+    upload.single('photo'),
     validateSchema(registerSchema),
     register);
 router.put(

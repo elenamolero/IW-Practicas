@@ -73,7 +73,6 @@ export const registerSchema = z.object({
 
   phone: z.string().optional(),
 
-  photo: z.string().optional(),
 
   role: z.enum(['member', 'trainer'], {
     required_error: 'El rol es requerido',
