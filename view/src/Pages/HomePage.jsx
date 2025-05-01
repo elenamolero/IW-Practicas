@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 function HomePage() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center relative overflow-hidden">
-      <nav className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center">
+      <nav className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-10">
         <span className="font-bold text-white text-lg">GYMPRO</span>
         <Link to="/login" className="text-white text-sm">Iniciar sesión</Link>
       </nav>
