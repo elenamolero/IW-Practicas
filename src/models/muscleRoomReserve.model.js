@@ -23,11 +23,6 @@ const muscleRoomReserveSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  numberOfPeople: {
-    type: Number,
-    required: true,
-    min: 1
-  },
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'cancelled', 'completed'],
@@ -41,7 +36,7 @@ const muscleRoomReserveSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Índice para evitar reservas duplicadas en el mismo horario
-muscleRoomReserveSchema.index({ muscleRoom: 1, date: 1, startTime: 1, endTime: 1 }, { unique: true });
+// Índice para evitar reservas duplicadas en el mismo horario para el mismo usuario
+muscleRoomReserveSchema.index({ user: 1, date: 1, startTime: 1, endTime: 1 }, { unique: true });
 
 export default mongoose.model('MuscleRoomReserve', muscleRoomReserveSchema); 
