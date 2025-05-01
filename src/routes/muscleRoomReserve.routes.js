@@ -4,7 +4,8 @@ import {
   getUserReserves, 
   getReserveById, 
   updateReserve, 
-  cancelReserve 
+  cancelReserve,
+  countCurrentReservationsByRoom
 } from '../controllers/muscleRoomReserve.controller.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { createMuscleRoomReserveSchema, updateMuscleRoomReserveSchema } from '../Schemas/muscleRoomReserve.schema.js';
@@ -21,6 +22,13 @@ router.post(
   validateSchema(createMuscleRoomReserveSchema),
   createMuscleRoomReserve
 );
+
+router.get(
+  '/muscle-room/:muscleRoomId/current-reservations',
+  authRequired,
+  countCurrentReservationsByRoom
+);
+
 
 // Obtener todas las reservas del usuario
 router.get(
