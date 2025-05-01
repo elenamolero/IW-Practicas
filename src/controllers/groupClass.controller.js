@@ -319,3 +319,30 @@ export const deleteGroupClass = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getGroupClassSchedule = async (req, res) => {
+  try {
+    const { date } = req.query; // opcional: filtrar por fecha específica YYYY-MM-DD
+
+    let filter = {};
+    if (date) {
+      const dayStart = new Date(date);
+      const dayEnd = new Date(date);
+      dayEnd.setDate(dayEnd.getDate() + 1);
+
+      filter.schedule = { $gte: dayStart, $lt: dayEnd };
+    }
+
+    const classes = await GroupClass.find(filter)
+      .populate('assignedTrainer', 'name') // incluir nombre del entrenador
+      .sort({ schedule: 1 });
+
+    res.json({
+      message: "Horario de clases encontrado",
+      classes
+    });
+  } catch (error) {
+    console.error("Error al obtener el horario:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
