@@ -33,7 +33,7 @@ export const countCurrentReservationsByRoom = async (req, res) => {
 // Crear una nueva reserva de sala de musculación
 export const createMuscleRoomReserve = async (req, res) => {
   try {
-    const { muscleRoom, date, startTime, endTime, numberOfPeople, notes } = req.body;
+    const { muscleRoom, date, startTime, endTime, notes } = req.body;
     const userId = req.user.id;
 
     // Verificar si la sala existe y está disponible
@@ -50,16 +50,9 @@ export const createMuscleRoomReserve = async (req, res) => {
       });
     }
 
-    // Verificar si el número de personas excede la capacidad
-    if (numberOfPeople > room.capacity) {
-      return res.status(400).json({
-        message: "El número de personas excede la capacidad de la sala"
-      });
-    }
-
-    // Verificar si ya existe una reserva para la misma sala en el mismo horario
+    // Verificar si el usuario ya tiene una reserva en el mismo horario
     const existingReserve = await MuscleRoomReserve.findOne({
-      muscleRoom,
+      user: userId,
       date,
       startTime,
       endTime,
@@ -68,7 +61,7 @@ export const createMuscleRoomReserve = async (req, res) => {
 
     if (existingReserve) {
       return res.status(400).json({
-        message: "Ya existe una reserva para esta sala en el horario seleccionado"
+        message: "Ya tienes una reserva en este horario"
       });
     }
 
@@ -79,7 +72,6 @@ export const createMuscleRoomReserve = async (req, res) => {
       date,
       startTime,
       endTime,
-      numberOfPeople,
       notes,
       status: 'pending'
     });
@@ -143,7 +135,7 @@ export const updateReserve = async (req, res) => {
   try {
     const { reserveId } = req.params;
     const userId = req.user.id;
-    const { date, startTime, endTime, numberOfPeople, notes, status } = req.body;
+    const { date, startTime, endTime, notes, status } = req.body;
     
     // Verificar si la reserva existe y pertenece al usuario
     const reserve = await MuscleRoomReserve.findOne({
@@ -157,20 +149,10 @@ export const updateReserve = async (req, res) => {
       });
     }
     
-    // Si se está actualizando el número de personas, verificar la capacidad
-    if (numberOfPeople) {
-      const room = await MuscleRoom.findById(reserve.muscleRoom);
-      if (numberOfPeople > room.capacity) {
-        return res.status(400).json({
-          message: "El número de personas excede la capacidad de la sala"
-        });
-      }
-    }
-    
     // Si se están actualizando fecha u hora, verificar disponibilidad
     if (date || startTime || endTime) {
       const existingReserve = await MuscleRoomReserve.findOne({
-        muscleRoom: reserve.muscleRoom,
+        user: userId,
         date: date || reserve.date,
         startTime: startTime || reserve.startTime,
         endTime: endTime || reserve.endTime,
@@ -180,7 +162,7 @@ export const updateReserve = async (req, res) => {
       
       if (existingReserve) {
         return res.status(400).json({
-          message: "Ya existe una reserva para esta sala en el horario seleccionado"
+          message: "Ya tienes una reserva en este horario"
         });
       }
     }
@@ -192,7 +174,6 @@ export const updateReserve = async (req, res) => {
         date: date || reserve.date,
         startTime: startTime || reserve.startTime,
         endTime: endTime || reserve.endTime,
-        numberOfPeople: numberOfPeople || reserve.numberOfPeople,
         notes: notes || reserve.notes,
         status: status || reserve.status
       },

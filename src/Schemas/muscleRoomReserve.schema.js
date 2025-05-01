@@ -21,12 +21,6 @@ export const createMuscleRoomReserveSchema = z.object({
     message: 'El formato de hora debe ser HH:MM',
   }),
 
-  numberOfPeople: z.number({
-    required_error: 'El número de personas es requerido',
-  }).min(1, {
-    message: 'El número de personas debe ser al menos 1',
-  }),
-
   notes: z.string().optional(),
 }).refine((data) => {
   // Validar que la hora de fin sea posterior a la hora de inicio
@@ -50,7 +44,6 @@ export const updateMuscleRoomReserveSchema = z.object({
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: 'El formato de hora debe ser HH:MM',
   }).optional(),
-  numberOfPeople: z.number().min(1).optional(),
   status: z.enum(['pending', 'confirmed', 'cancelled', 'completed']).optional(),
   notes: z.string().optional(),
 }).refine((data) => {
