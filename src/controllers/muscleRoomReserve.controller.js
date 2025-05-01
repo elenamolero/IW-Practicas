@@ -1,6 +1,35 @@
 import MuscleRoomReserve from "../models/muscleRoomReserve.model.js";
 import MuscleRoom from "../models/muscleRoom.model.js";
 
+
+export const countCurrentReservationsByRoom = async (req, res) => {
+  try {
+    const { muscleRoomId } = req.params; // ID de la sala de musculación
+    const currentDate = new Date();
+    const currentHour = currentDate.getHours();
+    const currentMinutes = currentDate.getMinutes();
+    const currentTime = `${currentHour.toString().padStart(2, '0')}:${currentMinutes.toString().padStart(2, '0')}`;
+
+    // Buscar reservas activas (que no estén canceladas) en la hora actual para la sala específica
+    const count = await MuscleRoomReserve.countDocuments({
+      muscleRoom: muscleRoomId,
+      date: { $eq: currentDate.toISOString().split('T')[0] }, // Fecha actual
+      startTime: { $lte: currentTime }, // Hora de inicio menor o igual a la hora actual
+      endTime: { $gt: currentTime }, // Hora de fin mayor a la hora actual
+      status: { $ne: 'cancelled' }, // Excluir reservas canceladas
+    });
+
+    res.json({
+      muscleRoomId,
+      currentTime,
+      count,
+    });
+  } catch (error) {
+    console.error("Error al contar las reservas actuales: ", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Crear una nueva reserva de sala de musculación
 export const createMuscleRoomReserve = async (req, res) => {
   try {
