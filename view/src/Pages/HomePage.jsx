@@ -1,11 +1,13 @@
 import React from "react";
+import { Link } from 'react-router-dom';
+
 
 function HomePage() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center relative overflow-hidden">
       <nav className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center">
         <span className="font-bold text-white text-lg">GYMPRO</span>
-        <button className="text-white text-sm">Iniciar sesión</button>
+        <Link to="/login" className="text-white text-sm">Iniciar sesión</Link>
       </nav>
 
       <div className="absolute inset-0 z-0">
@@ -27,9 +29,9 @@ function HomePage() {
         </div>
 
         <div>
-          <button className="bg-blue-400 hover:bg-blue-500 text-black text-3xl font-semibold py-3 px-8 rounded-full">
+          <Link to="/register" className="bg-blue-400 hover:bg-blue-500 text-black text-3xl font-semibold py-3 px-8 rounded-full">
             INSCRÍBETE
-          </button>
+          </Link>
         </div>
       </main>
     </div>
