@@ -87,7 +87,7 @@ function RegisterPage() {
           </div>
     
           {/* Contenido */}
-          <div className="z-10 w-full max-w-md px-8">
+          <div className="z-10 w-full max-w-md px-8 mt-20">
             <h1 className="text-4xl md:text-5xl font-bold text-center mb-10">
               ¿Estás listo para <br /> comenzar tu cambio?
             </h1>
