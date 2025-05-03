@@ -59,7 +59,7 @@ function RegisterPage() {
             height: Number(formData.height),
             photo: imageUrl || undefined // si no hay imagen, no se envía
           };
-          console.log('Datos enviados al backend:', userToSend);
+          
 
           // Ya no usamos FormData ni multipart
           const res = await axios.post("http://localhost:4000/api/register", userToSend, {
