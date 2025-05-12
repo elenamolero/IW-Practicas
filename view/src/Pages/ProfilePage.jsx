@@ -65,7 +65,7 @@ function ProfilePage() {
         <span className="font-bold text-xl">GYMPRO</span>
         <div className="flex gap-6">
           <a href="#" className="hover:text-gray-300">Home</a>
-          <a href="#" className="hover:text-gray-300">Mi Rutina</a>
+          <a href="/my-workouts-by-day/2025-04-30"  className="hover:text-gray-300">Mi Rutina</a>
           <a href="#" className="hover:text-gray-300">Clases Grupales</a>
           <a href="#" className="hover:text-gray-300">Sala de musculación</a>
         </div>

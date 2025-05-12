@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import { useParams } from "react-router-dom"; // Importa useParams
+import { useParams } from "react-router-dom";
 import { useWorkout } from "../context/WorkoutContext";
 
 const WorkoutPage = () => {
-  const { date } = useParams(); // Obtén el parámetro "date" de la URL
+  const { date } = useParams(); // Captura la fecha de la URL
   const { weeklyWorkouts, fetchWorkoutsByWeek, loading } = useWorkout();
 
   useEffect(() => {

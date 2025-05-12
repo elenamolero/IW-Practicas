@@ -9,20 +9,23 @@ export const WorkoutProvider = ({ children }) => {
   const [weeklyWorkouts, setWeeklyWorkouts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchWorkoutsByWeek = async () => {
+  const fetchWorkoutsByWeek = async (startDate) => {
     try {
       setLoading(true);
 
+      // Calcular el inicio de la semana (lunes) basado en la fecha proporcionada
+      const inputDate = new Date(startDate);
+      const dayOfWeek = inputDate.getDay(); // 0 (domingo) a 6 (sábado)
+      const startOfWeek = new Date(inputDate.setDate(inputDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1))); // Ajustar para que el lunes sea el inicio
 
-      const today = new Date();
-      const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 1)); // Lunes
+      // Generar las fechas de lunes a domingo
       const dates = Array.from({ length: 7 }, (_, i) => {
         const date = new Date(startOfWeek);
         date.setDate(startOfWeek.getDate() + i);
-        return date.toISOString().split("T")[0]; // Format YYYY-MM-DD
+        return date.toISOString().split("T")[0]; // Formato YYYY-MM-DD
       });
 
-        // Fetch workouts for each date in the week
+      // Realizar solicitudes para cada día de la semana
       const workoutsByDay = await Promise.all(
         dates.map(async (date) => {
           const response = await workoutRequest(date);
@@ -32,7 +35,7 @@ export const WorkoutProvider = ({ children }) => {
 
       setWeeklyWorkouts(workoutsByDay);
     } catch (error) {
-      console.error("Error getting workouts of the week:", error);
+      console.error("Error al obtener los workouts de la semana:", error);
     } finally {
       setLoading(false);
     }
