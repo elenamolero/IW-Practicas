@@ -11,7 +11,8 @@ export const createWorkout = async (req, res) => {
       repetitions,
       rest,
       order,
-      intensity
+      intensity,
+      weigh
     } = req.body;
     
     const userId = req.user.id;
@@ -86,7 +87,8 @@ export const createWorkout = async (req, res) => {
       repetitions,
       rest,
       order,
-      intensity
+      intensity,
+      weigh
     });
     
     // Guardar el workout
@@ -212,7 +214,8 @@ export const updateWorkout = async (req, res) => {
       repetitions,
       rest,
       order,
-      intensity
+      intensity,
+      weigh
     } = req.body;
     
     // Verificar si el workout existe y pertenece al usuario
@@ -286,6 +289,7 @@ export const updateWorkout = async (req, res) => {
     workout.rest = rest || workout.rest;
     workout.order = order || workout.order;
     workout.intensity = intensity || workout.intensity;
+    workout.weigh = weigh || workout.weigh;
     
     await workout.save();
     

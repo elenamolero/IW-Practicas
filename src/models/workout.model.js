@@ -36,6 +36,12 @@ const workoutSchema = new mongoose.Schema({
     min: 1 
   },
   intensity: {
+    type: String,
+    required: true,
+    min: 1,
+    max: 10 // Scale of 1 to 10
+  },
+  weigh: {
     type: Number,
     required: true,
     min: 1,
