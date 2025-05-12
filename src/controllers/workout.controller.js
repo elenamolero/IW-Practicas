@@ -106,6 +106,43 @@ export const createWorkout = async (req, res) => {
   }
 };
 
+export const getUserWorkoutsByDate = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { date } = req.params; // Fecha proporcionada en la URL (YYYY-MM-DD)
+
+    if (!date) {
+      return res.status(400).json({
+        message: "La fecha es requerida en el formato YYYY-MM-DD.",
+      });
+    }
+
+    // Convertir la fecha proporcionada a un rango de inicio y fin del día
+    const startOfDay = new Date(date);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Obtener los workouts del usuario en el rango de la fecha especificada
+    const workouts = await Workout.find({
+      user_id: userId,
+      date: { $gte: startOfDay, $lte: endOfDay },
+    })
+      .populate("workoutType_id", "title description")
+      .sort({ date: -1, order: 1 });
+
+    res.json({
+      message: "Workouts obtenidos exitosamente.",
+      workouts,
+    });
+  } catch (error) {
+    console.error("Error al obtener los workouts: ", error);
+    res.status(500).json({
+      message: "Error al obtener los workouts",
+      error: error.message,
+    });
+  }
+};
+
 // Obtener todos los workouts de un usuario
 export const getUserWorkouts = async (req, res) => {
   try {
