@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useWorkout } from "../context/WorkoutContext";
+import Navbar from "../Components/Navbar";
 import "./Styles/WorkoutPage.css";
 
 const WorkoutPage = () => {
@@ -42,7 +43,8 @@ const WorkoutPage = () => {
     : "";
 
   return (
-    <div className="workout-page bg-white text-black min-h-screen p-6">
+    <div className="workout-page bg-white text-black min-h-screen p-6 pt-20">
+      <Navbar />
       <h1 className="text-center text-4xl font-bold mb-2">Rutina</h1>
       <h2 className="text-center text-2xl font-semibold text-gray-600 mb-6">{month}</h2>
       {loading ? (

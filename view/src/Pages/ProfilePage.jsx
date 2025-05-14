@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Navbar from "../Components/Navbar";
 import { FaUser } from "react-icons/fa";
 
 function ProfilePage() {
@@ -53,25 +54,15 @@ function ProfilePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-20">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-white text-black">
-            {/* NAVBAR */}
-            <nav className="bg-black text-white flex justify-between items-center px-8 py-4">
-                <span className="font-bold text-xl">GYMPRO</span>
-                <div className="flex gap-6">
-                    <a href="#" className="hover:text-gray-300">Home</a>
-                    <a href={`/my-workouts-by-day/${currentDate}`} className="hover:text-gray-300">Mi Rutina</a>
-                    <a href="#" className="hover:text-gray-300">Clases Grupales</a>
-                    <a href="#" className="hover:text-gray-300">Sala de musculación</a>
-                </div>
-                <FaUser className="text-2xl" />
-            </nav>
+        <div className="min-h-screen bg-white text-black pt-20">
+            <Navbar currentDate={currentDate} />
 
             {/* CONTENIDO */}
             <main className="px-8 py-12 text-center">
