@@ -13,19 +13,28 @@ export const WorkoutProvider = ({ children }) => {
     try {
       setLoading(true);
 
-      // Calcular el inicio de la semana (lunes) basado en la fecha proporcionada
+      // Calcular el inicio de la semana (lunes)
       const inputDate = new Date(startDate);
-      const dayOfWeek = inputDate.getDay(); // 0 (domingo) a 6 (sábado)
-      const startOfWeek = new Date(inputDate.setDate(inputDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1))); // Ajustar para que el lunes sea el inicio
+      const dayOfWeek = inputDate.getDay();
+      const startOfWeek = new Date(inputDate.setDate(inputDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
 
-      // Generar las fechas de lunes a domingo
+      // Fechas de lunes a domingo de la semana actual
       const dates = Array.from({ length: 7 }, (_, i) => {
         const date = new Date(startOfWeek);
         date.setDate(startOfWeek.getDate() + i);
-        return date.toISOString().split("T")[0]; // Formato YYYY-MM-DD
+        return date.toISOString().split("T")[0];
       });
 
-      // Realizar solicitudes para cada día de la semana
+      // Fechas de la semana anterior
+      const prevWeekStart = new Date(startOfWeek);
+      prevWeekStart.setDate(startOfWeek.getDate() - 7);
+      const prevWeekDates = Array.from({ length: 7 }, (_, i) => {
+        const date = new Date(prevWeekStart);
+        date.setDate(prevWeekStart.getDate() + i);
+        return date.toISOString().split("T")[0];
+      });
+
+      // Pedir workouts de la semana actual
       const workoutsByDay = await Promise.all(
         dates.map(async (date) => {
           const response = await workoutRequest(date);
@@ -33,7 +42,30 @@ export const WorkoutProvider = ({ children }) => {
         })
       );
 
-      setWeeklyWorkouts(workoutsByDay);
+      // Si hay días vacíos, pedir la semana anterior y copiar los workouts si existen
+      const hasEmptyDays = workoutsByDay.some(day => !day.workouts || day.workouts.length === 0);
+      let prevWeekWorkouts = [];
+      if (hasEmptyDays) {
+        prevWeekWorkouts = await Promise.all(
+          prevWeekDates.map(async (date) => {
+            const response = await workoutRequest(date);
+            return { date, workouts: response.data.workouts };
+          })
+        );
+      }
+
+      // Rellenar días vacíos con los de la semana anterior
+      const filledWorkouts = workoutsByDay.map((day, idx) => {
+        if (!day.workouts || day.workouts.length === 0) {
+          const prev = prevWeekWorkouts[idx];
+          return prev && prev.workouts.length > 0
+            ? { ...day, workouts: prev.workouts }
+            : day;
+        }
+        return day;
+      });
+
+      setWeeklyWorkouts(filledWorkouts);
     } catch (error) {
       console.error("Error al obtener los workouts de la semana:", error);
     } finally {
