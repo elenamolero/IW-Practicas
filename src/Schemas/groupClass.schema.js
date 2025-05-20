@@ -4,7 +4,9 @@ export const createClassSchema = z.object({
   name: z.string({
     required_error: 'Class name is required',
   }),
-
+  description: z.string({
+    required_error: 'Description name is required',
+  }),
   schedule: z.string({
     required_error: 'Schedule is required',
   }),
@@ -28,6 +30,7 @@ export const createClassSchema = z.object({
 
 export const updateClassSchema = z.object({
   name: z.string().optional(),
+  description: z.string().optional(),
   schedule: z.string().optional(),
   maxCapacity: z.number().min(1).optional(),
   difficultyLevel: z.enum(['beginner', 'intermediate', 'advanced']).optional(),

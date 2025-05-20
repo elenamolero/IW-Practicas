@@ -6,7 +6,8 @@ import {
   getGroupClassDetails, 
   reserveGroupClass, 
   deleteGroupClass, 
-  getGroupClassSchedule 
+  getGroupClassSchedule ,
+  getGroupClassesByDate
 } from '../controllers/groupClass.controller.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { createClassSchema, updateClassSchema } from '../Schemas/groupClass.schema.js';
@@ -61,6 +62,13 @@ router.delete(
 router.get(
   '/group-class-schedule',
   getGroupClassSchedule // No requiere auth, o puedes poner authRequired si quieres protegerlo
+);
+
+router.get(
+  '/my-classes-by-day/:date',
+  authRequired,
+  requireRole(['trainer', 'member']),
+  getGroupClassesByDate
 );
 
 export default router;

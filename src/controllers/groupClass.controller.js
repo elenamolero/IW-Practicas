@@ -6,6 +6,7 @@ export const createGroupClass = async (req, res) => {
 
     const {
       name,
+      description,
       schedule,
       maxCapacity,
       assignedTrainer,
@@ -72,6 +73,7 @@ export const createGroupClass = async (req, res) => {
     }
     const newClass = new GroupClass({
       name,
+      description,
       schedule: classSchedule,  // Guardamos la fecha ya convertida
       maxCapacity,
       assignedTrainer,
@@ -134,6 +136,7 @@ export const updateGroupClass = async (req, res) => {
     const { classId } = req.params;
     const {
       name,
+      description,
       schedule,
       maxCapacity,
       difficultyLevel,
@@ -215,6 +218,7 @@ export const updateGroupClass = async (req, res) => {
       classId,
       {
         name: name || groupClass.name,
+        description: description || groupClass.description,
         schedule: schedule ? new Date(schedule) : groupClass.schedule,
         maxCapacity: maxCapacity || groupClass.maxCapacity,
         difficultyLevel: difficultyLevel || groupClass.difficultyLevel,
@@ -344,5 +348,39 @@ export const getGroupClassSchedule = async (req, res) => {
   } catch (error) {
     console.error("Error al obtener el horario:", error);
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const getGroupClassesByDate = async (req, res) => {
+  try {
+    const { date } = req.params; 
+
+    if (!date) {
+      return res.status(400).json({
+        message: "La fecha es requerida en el formato YYYY-MM-DD.",
+      });
+    }
+
+    const startOfDay = new Date(date);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const classes = await GroupClass.find({
+      schedule: { $gte: startOfDay, $lte: endOfDay },
+    })
+      .populate("assignedTrainer", "firstName")
+      .populate("attendees", "firstName")
+      .sort({ schedule: 1 });
+
+    res.json({
+      message: "Clases grupales obtenidas exitosamente.",
+      classes,
+    });
+  } catch (error) {
+    console.error("Error al obtener las clases grupales: ", error);
+    res.status(500).json({
+      message: "Error al obtener las clases grupales",
+      error: error.message,
+    });
   }
 };
