@@ -1,50 +1,32 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../Components/Navbar";
-import { FaUser } from "react-icons/fa";
+import { useAuth } from "../Context/AuthContext";
 
 function ProfilePage() {
-    const [userData, setUserData] = useState(null);
+    const { user, isAuthenticated } = useAuth();
     const [loading, setLoading] = useState(true);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [myGroupClasses, setMyGroupClasses] = useState([]);
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const res = await axios.get("http://localhost:4000/api/profile", {
-                    withCredentials: true
-                });
-                setUserData(res.data);
-            } catch (error) {
-                console.error("Error al obtener datos del usuario:", error);
-            }
-        };
-
         const fetchMyClasses = async () => {
             try {
                 const res = await axios.get("http://localhost:4000/api/my-upcoming-group-classes", {
                     withCredentials: true
                 });
-                console.log("Datos recibidos de /my-upcoming-group-classes:", res.data);
                 setMyGroupClasses(res.data.classes);
-                console.log("obtiene las clases futuras");
             } catch (error) {
                 console.error("Error al obtener tus clases:", error);
             }
-        };
-
-        const fetchAll = async () => {
-            await fetchUserData();
-            await fetchMyClasses();
             setLoading(false);
         };
 
-        fetchAll();
+        fetchMyClasses();
 
         const interval = setInterval(() => {
             setCurrentTime(new Date());
-        }, 1000); // actualiza cada segundo
+        }, 1000);
 
         return () => clearInterval(interval);
     }, []);
@@ -68,7 +50,9 @@ function ProfilePage() {
             <main className="px-8 py-12 text-center">
                 {/* TÍTULO */}
                 <h1 className="text-5xl md:text-6xl font-bold mb-6">
-                    Bienvenid@ de nuevo {userData?.firstName || "Usuario"}
+                    {isAuthenticated && user?.firstName
+                        ? `Bienvenid@ de nuevo ${user.firstName}`
+                        : "Bienvenid@"}
                 </h1>
 
                 {/* INFORMACIÓN CENTRAL */}
