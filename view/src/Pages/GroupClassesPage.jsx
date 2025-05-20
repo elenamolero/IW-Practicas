@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGroupClass } from "../Context/GroupClassesContext";
-import { useAuth } from "../Context/AuthContext"; // Asegúrate de tener este hook/contexto
+import { useAuth } from "../Context/AuthContext";
 import Navbar from "../Components/Navbar";
 import "./Styles/WorkoutPage.css";
 
@@ -12,18 +12,12 @@ const GroupClassesPage = () => {
   const { user, loading: authLoading } = useAuth();
   const [selectedDate, setSelectedDate] = useState(date);
 
-  // DEPURACIÓN: log de user y loading cada vez que cambian
-  useEffect(() => {
-    console.log("GroupClassesPage - user:", user);
-    console.log("GroupClassesPage - authLoading:", authLoading);
-  }, [user, authLoading]);
-
   useEffect(() => {
     if (date) {
       fetchClassesByWeek(date);
       setSelectedDate(date);
     }
-  }, [date]);
+  }, [date, fetchClassesByWeek]);
 
   // Espera a que el usuario esté cargado antes de renderizar la página
   if (authLoading) {
@@ -34,18 +28,19 @@ const GroupClassesPage = () => {
     );
   }
 
-  // DEPURACIÓN: log de user justo antes del render principal
-  console.log("GroupClassesPage - usuario autenticado para render:", user);
-
-
-  console.log("Usuario autenticado:", user);
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-xl text-red-500">No se pudo cargar el usuario. ¿Has iniciado sesión?</p>
+      </div>
+    );
+  }
 
   const handleDateClick = (date) => {
     setSelectedDate(date);
   };
 
-
-  // Navegación entre semanas
+  // Navegación entre semanas: NO pases el usuario por state
   const goToPreviousWeek = () => {
     const current = new Date(date);
     current.setDate(current.getDate() - 7);
@@ -65,7 +60,7 @@ const GroupClassesPage = () => {
   const month = selectedDate
     ? new Date(selectedDate).toLocaleDateString("es-ES", { month: "long" })
     : "";
-console.log("Usuario autenticado:", user);
+
   return (
     <div className="group-classes-page bg-white text-black min-h-screen p-6 pt-20">
       <Navbar />

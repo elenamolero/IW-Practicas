@@ -1,9 +1,13 @@
 import React from "react";
 import { FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext"; 
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth(); 
+
+  console.log("Usuario en Navbar:", user);
 
   const handleRutinaClick = (e) => {
     e.preventDefault();
@@ -17,7 +21,8 @@ const Navbar = () => {
   const handleGroupClassesClick = (e) => {
     e.preventDefault();
     const today = new Date().toISOString().split("T")[0];
-    navigate(`/group-classes-by-day/${today}`);
+    // Pasa el usuario como parámetro en el estado de navegación
+    navigate(`/group-classes-by-day/${today}`, { state: { user } });
     if (window.location.pathname === `/group-classes-by-day/${today}`) {
       window.location.reload();
     }
@@ -44,7 +49,12 @@ const Navbar = () => {
         </a>
         <a href="#" className="hover:text-gray-300">Sala de musculación</a>
       </div>
-      <FaUser className="text-2xl" />
+      <div className="flex items-center gap-2">
+        <FaUser className="text-2xl" />
+        {isAuthenticated && user && (
+          <span className="text-sm font-semibold">{user.firstName || user.username || "Usuario"}</span>
+        )}
+      </div>
     </nav>
   );
 };
