@@ -75,7 +75,8 @@ export const generateMonthlyInvoice = async (req, res) => {
         user: userId,
         name: `${user.firstName} ${user.lastName}`,
         taxId: recipientTaxId || "",
-        address: recipientAddress || ""
+        address: recipientAddress || "",
+        bankAccount: user.bankAccount || ""
       },
       items: [
         {
