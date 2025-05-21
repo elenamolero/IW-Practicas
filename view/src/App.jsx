@@ -10,6 +10,7 @@ import { WorkoutProvider } from "./context/WorkoutContext";
 import GroupClassesPage from "./Pages/GroupClassesPage"; // importa tu página
 import { GroupClassProvider } from "./Context/GroupClassesContext"; // importa tu contexto
 import AssistantListPage from "./Pages/AssistantListPage"; 
+import ReceiptsListPage from "./Pages/ReceiptsListPage";
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
             <Route path="/my-workouts-by-day/:date" element={<WorkoutPage />} />
             <Route path="/group-classes-by-day/:date" element={<GroupClassesPage />} />
             <Route path="/group-class/:id/attendees" element={<AssistantListPage />} />
+            <Route path="/myInvoices" element={<ReceiptsListPage />} />
           </Routes>
         </GroupClassProvider>
       </WorkoutProvider>
