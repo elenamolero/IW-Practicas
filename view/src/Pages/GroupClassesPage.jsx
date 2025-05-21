@@ -183,6 +183,11 @@ const handleDeleteClass = async (classId) => {
                 const classDate = new Date(groupClass.schedule);
                 const isFutureOrNow = classDate >= now;
 
+                const handleShowAttendees = (classId) => {
+                  navigate(`/group-class/${classId}/attendees/`);
+                };
+
+
                 return (
                   <div
                     key={groupClass._id}
