@@ -13,17 +13,20 @@ const GroupClassesPage = () => {
   const [selectedDate, setSelectedDate] = useState(date);
 
   useEffect(() => {
+    console.log("[GroupClassesPage] useEffect called with date:", date);
     if (date) {
       fetchClassesByWeek(date);
       setSelectedDate(date);
     }
-  }, [date, fetchClassesByWeek]);
+    // SOLO depende de date, no de fetchClassesByWeek
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date]);
 
-  // Espera a que el usuario esté cargado antes de renderizar la página
+  // Loader solo para usuario
   if (authLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <p className="text-xl">Cargando usuario...</p>
+        <p className="text-xl">Cargando...</p>
       </div>
     );
   }
@@ -40,7 +43,6 @@ const GroupClassesPage = () => {
     setSelectedDate(date);
   };
 
-  // Navegación entre semanas: NO pases el usuario por state
   const goToPreviousWeek = () => {
     const current = new Date(date);
     current.setDate(current.getDate() - 7);

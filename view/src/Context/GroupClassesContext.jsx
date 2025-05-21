@@ -10,8 +10,10 @@ export const GroupClassProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   const fetchClassesByWeek = async (startDate) => {
+    console.log("[GroupClassesContext] fetchClassesByWeek called with:", startDate);
     try {
       setLoading(true);
+      console.log("[GroupClassesContext] loading set to true");
 
       // Calcular el inicio de la semana (lunes)
       const inputDate = new Date(startDate);
@@ -41,6 +43,7 @@ export const GroupClassProvider = ({ children }) => {
           return { date, classes: response.data.classes };
         })
       );
+      console.log("[GroupClassesContext] classesByDay:", classesByDay);
 
       // Si hay días vacíos, pedir la semana anterior y copiar las clases si existen
       const hasEmptyDays = classesByDay.some(day => !day.classes || day.classes.length === 0);
@@ -52,6 +55,7 @@ export const GroupClassProvider = ({ children }) => {
             return { date, classes: response.data.classes };
           })
         );
+        console.log("[GroupClassesContext] prevWeekClasses:", prevWeekClasses);
       }
 
       // Rellenar días vacíos con los de la semana anterior
@@ -66,10 +70,12 @@ export const GroupClassProvider = ({ children }) => {
       });
 
       setWeeklyClasses(filledClasses);
+      console.log("[GroupClassesContext] weeklyClasses set:", filledClasses);
     } catch (error) {
-      console.error("Error al obtener las clases de la semana:", error);
+      console.error("[GroupClassesContext] Error al obtener las clases de la semana:", error);
     } finally {
       setLoading(false);
+      console.log("[GroupClassesContext] loading set to false");
     }
   };
 
