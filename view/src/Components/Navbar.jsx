@@ -66,7 +66,12 @@ const Navbar = () => {
       <div className="flex items-center gap-2">
         <FaUser className="text-2xl" />
         {isAuthenticated && user && (
-          <span className="text-sm font-semibold">{user.firstName || user.username || "Usuario"}</span>
+          <button
+          onClick={() => navigate("/profile-settings")}
+          className="text-sm font-semibold hover:underline"
+            >
+          {user.firstName || user.username || "Usuario"}
+          </button>
         )}
       </div>
     </nav>
