@@ -121,8 +121,8 @@ const WorkoutPage = () => {
           </div>
         </div>
       )}
-      <button className="fixed bottom-4 right-4 bg-blue-500 text-white p-4 rounded-full shadow-lg text-2xl">
-        +
+      <button className="fixed bottom-4 right-4 bg-blue-500 text-white p-4 rounded-full shadow-lg text-l">
+        + Añadir Ejercicio
       </button>
     </div>
   );

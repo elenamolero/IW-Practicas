@@ -129,6 +129,7 @@ const handleDeleteClass = async (classId) => {
         </div>
       )}
       <h1 className="text-center text-4xl font-bold mb-2">Clases Grupales</h1>
+      <h2 className="text-center text-2xl font-semibold text-gray-600 mb-6">(duración de 1 h/clase)</h2>
       <h2 className="text-center text-2xl font-semibold text-gray-600 mb-6">{month}</h2>
       {loading ? (
         <p className="text-center text-xl">Cargando...</p>
@@ -225,6 +226,9 @@ const handleDeleteClass = async (classId) => {
                               onClick={() => handleShowAttendees(groupClass._id)}
                             >
                               Asistentes
+                            </button>
+                            <button className="fixed bottom-4 right-4 bg-blue-500 text-white p-4 rounded-full shadow-lg text-l">
+                              + Añadir Clase
                             </button>
                           </>
                         )}
