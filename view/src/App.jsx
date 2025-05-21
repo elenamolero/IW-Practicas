@@ -8,10 +8,10 @@ import ProtectedRoute from "./ProtectedRoute";
 import WorkoutPage from "./Pages/WorkoutPage";
 import { WorkoutProvider } from "./context/WorkoutContext";
 import AssistantListPage from "./Pages/AssistantListPage"; 
-import ReceiptsListPage from "./Pages/ReceiptsListPage";
 import GroupClassesPage from "./Pages/GroupClassesPage";
 import { GroupClassProvider } from "./Context/GroupClassesContext";
 import ProfilePageSettings from "./Pages/ProfilePageSettings";
+import ReceiptsListPage from "./Pages/ReceiptsListPage";
 
 
 function App() {
@@ -30,7 +30,7 @@ function App() {
             <Route path="/my-workouts-by-day/:date" element={<WorkoutPage />} />
             <Route path="/group-classes-by-day/:date" element={<GroupClassesPage />} />
             <Route path="/group-class/:id/attendees" element={<AssistantListPage />} />
-            <Route path="/myInvoices" element={<ReceiptsListPage />} />
+            <Route path="/my-invoices" element={<ReceiptsListPage />} />
           </Routes>
         </GroupClassProvider>
       </WorkoutProvider>

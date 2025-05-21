@@ -9,7 +9,7 @@ function ReceiptsListPage() {
   useEffect(() => {
     const fetchReceipts = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/my-invoices", {
+          const res = await fetch("http://localhost:4000/api/my-invoices", {
           credentials: "include", 
         });
 

@@ -12,6 +12,10 @@ const ProfilePageSettings = () => {
   const { user, isAuthenticated, logout: logoutFromContext } = useAuth();
   const navigate = useNavigate();
 
+const handleReceiptsNavigation = () => {
+  navigate("/my-invoices"); // Asegúrate de que esta ruta coincida con la definida en tu router
+};
+
 const handleLogout = async () => {
     try {
       await axios.post("http://localhost:4000/api/logout", {}, { withCredentials: true });
@@ -100,8 +104,10 @@ const handleLogout = async () => {
             >
             cancelar suscripción
           </button>
-          <button className="border border-green-600 text-green-700 px-4 py-2 rounded-full hover:bg-green-100 transition">
-            consultar recibos
+          <button
+           onClick={handleReceiptsNavigation}
+           className="border border-green-600 text-green-700 px-4 py-2 rounded-full hover:bg-green-100 transition"
+          >consultar recibos
           </button>
           <button
             onClick={handleLogout}
