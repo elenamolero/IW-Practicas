@@ -7,10 +7,10 @@ import { AuthProvider } from "./Context/AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
 import WorkoutPage from "./Pages/WorkoutPage";
 import { WorkoutProvider } from "./context/WorkoutContext";
-import GroupClassesPage from "./Pages/GroupClassesPage"; // importa tu página
-import { GroupClassProvider } from "./Context/GroupClassesContext"; // importa tu contexto
 import AssistantListPage from "./Pages/AssistantListPage"; 
-
+import GroupClassesPage from "./Pages/GroupClassesPage";
+import { GroupClassProvider } from "./Context/GroupClassesContext";
+import ProfilePageSettings from "./Pages/ProfilePageSettings";
 
 function App() {
   return (
@@ -24,6 +24,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<ProfilePage />} />
             </Route>
+            <Route path="/profile-settings" element={<ProfilePageSettings />} />
             <Route path="/my-workouts-by-day/:date" element={<WorkoutPage />} />
             <Route path="/group-classes-by-day/:date" element={<GroupClassesPage />} />
             <Route path="/group-class/:id/attendees" element={<AssistantListPage />} />
