@@ -15,31 +15,35 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [errors, setErrors] = useState([]);
-    const [loading, setloading] = useState(true);
+    const [loading, setLoading] = useState(true); // <-- Consistente aquí
 
-    const signup = async (user) => {
-        try {
-            const res = await registerRequest(user);
-            setUser(res.data);
-            setIsAuthenticated(true);
-        } catch (error) {
-            setErrors(error.response.data);
-        }
-    };
+  const signup = async (user) => {
+    try {
+        const res = await registerRequest(user);
+        setUser(res.data);
+        setIsAuthenticated(true);
+        setLoading(false); // <-- Añade esto
+    } catch (error) {
+        setErrors(error.response.data);
+        setLoading(false); // <-- Añade esto
+    }
+};
 
-    const signin = async (user) => {
-        try {
-            const res = await loginRequest(user)
-            setIsAuthenticated(true);
-            setUser(res.data);
-          //  window.location.reload();
-        } catch (error) {
-            if (Array.isArray(error.response.data)) {
-                return setErrors(error.response.data)
-            }
+const signin = async (user) => {
+    try {
+        const res = await loginRequest(user)
+        setIsAuthenticated(true);
+        setUser(res.data);
+        setLoading(false); // <-- Añade esto
+    } catch (error) {
+        if (Array.isArray(error.response.data)) {
+            setErrors(error.response.data)
+        } else {
             setErrors([error.response.data.message])
         }
-    }; 
+        setLoading(false); // <-- Añade esto
+    }
+};
 
     useEffect(() => {
         if (errors.length > 0) {
@@ -54,32 +58,28 @@ export const AuthProvider = ({ children }) => {
         Cookies.remove("token");
         setIsAuthenticated(false);
         setUser(null);
+        setLoading(false); // <-- Añadido para evitar loading infinito tras logout
     }
 
-   useEffect(() => {
-    console.log("useEffect de checkLogin ejecutado");
-    async function checkLogin() {
-        try {
-            // No necesitas leer la cookie, solo haz la petición
-            const res = await verifyTokenRequet();
-            console.log("Respuesta de verifyTokenRequet:", res.data);
-            if (!res.data) {
+    useEffect(() => {
+        async function checkLogin() {
+            try {
+                const res = await verifyTokenRequet();
+                if (!res.data) {
+                    setIsAuthenticated(false);
+                    setUser(null);
+                } else {
+                    setIsAuthenticated(true);
+                    setUser(res.data);
+                }
+            } catch (error) {
                 setIsAuthenticated(false);
                 setUser(null);
-                setloading(false);
-                return;
             }
-            setIsAuthenticated(true);
-            setUser(res.data);
-            setloading(false);
-        } catch (error) {
-            setIsAuthenticated(false);
-            setUser(null);
-            setloading(false);
+            setLoading(false); // <-- SOLO aquí, después de comprobar el usuario
         }
-    }
-    checkLogin();
-}, []);
+        checkLogin();
+    }, []);
 
     return (
         <AuthContext.Provider value={{
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }) => {
             loading,
             logout,
             user,
-            setUser, // <-- Añadido para poder actualizar el usuario desde otras páginas
+            setUser,
             isAuthenticated,
             errors
         }}>
