@@ -7,7 +7,10 @@ export const createWorkoutType = async (req, res) => {
     const { title, description } = req.body;
     const userId = req.user.id;
 
-    // Buscar si ya existe un tipo de entrenamiento con el mismo título para este usuario
+    console.log("Título recibido:", title);
+    console.log("Título normalizado:", title.trim());
+    console.log("User ID:", userId);
+    
     const existingWorkoutType = await WorkoutType.findOne({
         title,
         user_id: userId
