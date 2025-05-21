@@ -8,6 +8,8 @@ function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [myGroupClasses, setMyGroupClasses] = useState([]);
+    const [currentGymReservations, setCurrentGymReservations] = useState(0);
+
 
     useEffect(() => {
         const fetchMyClasses = async () => {
@@ -22,7 +24,19 @@ function ProfilePage() {
             setLoading(false);
         };
 
+        const fetchCurrentGymReservations = async () => {
+          try {
+              const res = await axios.get("http://localhost:4000/api/current-gym-reservations", {
+                  withCredentials: true
+              });
+              setCurrentGymReservations(res.data.count);
+          } catch (error) {
+              console.error("Error al obtener el aforo del gimnasio:", error);
+          }
+      };
+
         fetchMyClasses();
+        fetchCurrentGymReservations();
 
         const interval = setInterval(() => {
             setCurrentTime(new Date());
@@ -44,7 +58,7 @@ function ProfilePage() {
 
     return (
         <div className="min-h-screen bg-white text-black pt-20">
-            <Navbar currentDate={currentDate} />
+            <Navbar />
 
             {/* CONTENIDO */}
             <main className="px-8 py-12 text-center">
@@ -65,7 +79,7 @@ function ProfilePage() {
                     {/* AFORO */}
                     <div>
                         <h2 className="text-xl font-semibold">AFORO ACTUAL RESERVADO</h2>
-                        <p className="text-3xl font-bold">80 socios</p>
+                        <p className="text-3xl font-bold">{currentGymReservations} socios</p>
                         <p className="text-sm text-red-600 mt-1">*aforo máx. 200 personas</p>
                     </div>
                 </div>

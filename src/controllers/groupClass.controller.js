@@ -384,3 +384,32 @@ export const getGroupClassesByDate = async (req, res) => {
     });
   }
 };
+
+export const cancelGroupClassReservation = async (req, res) => {
+  try {
+    const { classId } = req.params;
+
+    // Buscar la clase
+    const groupClass = await GroupClass.findById(classId);
+    if (!groupClass) {
+      return res.status(404).json({ message: "Clase grupal no encontrada" });
+    }
+
+    // Verificar si el usuario está en la lista de asistentes
+    const userIndex = groupClass.attendees.findIndex(
+      attendee => attendee.toString() === req.user.id
+    );
+    if (userIndex === -1) {
+      return res.status(400).json({ message: "No estás inscrito en esta clase" });
+    }
+
+    // Eliminar al usuario de la lista de asistentes
+    groupClass.attendees.splice(userIndex, 1);
+    await groupClass.save();
+
+    res.status(200).json({ message: "Reserva cancelada con éxito", class: groupClass });
+  } catch (error) {
+    console.error("Error al cancelar la reserva: ", error);
+    res.status(500).json({ message: error.message });
+  }
+};
