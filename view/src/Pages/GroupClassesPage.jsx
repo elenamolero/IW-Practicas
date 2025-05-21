@@ -8,7 +8,8 @@ import "./Styles/WorkoutPage.css";
 const GroupClassesPage = () => {
   const { date } = useParams();
   const navigate = useNavigate();
-  const { weeklyClasses, fetchClassesByWeek, reserveGroupClass, loading } = useGroupClass();
+  // Añadimos cancelGroupClassReservation al context
+  const { weeklyClasses, fetchClassesByWeek, reserveGroupClass, cancelGroupClassReservation, loading } = useGroupClass();
   const { user, loading: authLoading } = useAuth();
   const [selectedDate, setSelectedDate] = useState(date);
   const [message, setMessage] = useState(null); 
@@ -63,17 +64,31 @@ const GroupClassesPage = () => {
     ? new Date(selectedDate).toLocaleDateString("es-ES", { month: "long" })
     : "";
 
-  const handleReserve = async (classId) => {
-    try {
-      await reserveGroupClass(classId);
-      setMessage("Reserva realizada con éxito");
-      setMessageType("success");
-    } catch (error) {
-      setMessage(error.message || "Error al reservar la clase");
-      setMessageType("error");
-    }
-    setTimeout(() => setMessage(null), 1900);
-  };
+const handleReserve = async (classId) => {
+  try {
+    await reserveGroupClass(classId);
+    setMessage("Reserva realizada con éxito");
+    setMessageType("success");
+    await fetchClassesByWeek(selectedDate); // <-- refresca datos
+  } catch (error) {
+    setMessage(error.message || "Error al reservar la clase");
+    setMessageType("error");
+  }
+  setTimeout(() => setMessage(null), 1900);
+};
+
+const handleCancelReservation = async (classId) => {
+  try {
+    await cancelGroupClassReservation(classId);
+    setMessage("Reserva cancelada con éxito");
+    setMessageType("success");
+    await fetchClassesByWeek(selectedDate); // <-- refresca datos
+  } catch (error) {
+    setMessage(error.message || "Error al cancelar la reserva");
+    setMessageType("error");
+  }
+  setTimeout(() => setMessage(null), 1900);
+};
 
   return (
     <div className="group-classes-page bg-white text-black min-h-screen p-6 pt-20">
@@ -155,8 +170,8 @@ const GroupClassesPage = () => {
                       </h3>
                       <p className="text-sm text-gray-600">{groupClass.description}</p>
                       <p className="text-sm text-gray-600">
-                      Horario: {classDate.toISOString().slice(11, 16)} 
-                    </p>
+                        Horario: {classDate.toISOString().slice(11, 16)} 
+                      </p>
                     </div>
                     <div className="group-class-info-right text-right flex flex-col items-end">
                       <p className="text-sm font-bold text-red-500 mb-2">
@@ -193,7 +208,15 @@ const GroupClassesPage = () => {
                                 Reservar
                               </button>
                             )}
-                            <button className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-xs">Cancelar</button>
+                            {/* Botón cancelar solo si está reservada */}
+                            {isReservedByUser && (
+                              <button
+                                className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-xs"
+                                onClick={() => handleCancelReservation(groupClass._id)}
+                              >
+                                Cancelar
+                              </button>
+                            )}
                           </>
                         )}
                         {/* El botón de asistentes siempre visible */}

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { groupClassRequest, reserveGroupClassRequest } from "../api/class"; 
+import { groupClassRequest, reserveGroupClassRequest, cancelGroupClassReservationRequest } from "../api/class"; 
 
 const GroupClassContext = createContext();
 
@@ -61,8 +61,30 @@ export const GroupClassProvider = ({ children }) => {
     }
   };
 
+const cancelGroupClassReservation = async (classId) => {
+    try {
+      setLoading(true);
+      const response = await cancelGroupClassReservationRequest(classId);
+      console.log("[GroupClassesContext] Reserva cancelada:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("[GroupClassesContext] Error al cancelar reserva:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Error al cancelar la reserva");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <GroupClassContext.Provider value={{ weeklyClasses, fetchClassesByWeek, reserveGroupClass, loading }}>
+    <GroupClassContext.Provider
+      value={{
+        weeklyClasses,
+        fetchClassesByWeek,
+        reserveGroupClass,
+        cancelGroupClassReservation,
+        loading,
+      }}
+    >
       {children}
     </GroupClassContext.Provider>
   );
