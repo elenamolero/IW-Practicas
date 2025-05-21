@@ -7,7 +7,8 @@ import {
   reserveGroupClass, 
   deleteGroupClass, 
   getGroupClassSchedule ,
-  getGroupClassesByDate
+  getGroupClassesByDate,
+  cancelGroupClassReservation
 } from '../controllers/groupClass.controller.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { createClassSchema, updateClassSchema } from '../Schemas/groupClass.schema.js';
@@ -71,4 +72,11 @@ router.get(
   getGroupClassesByDate
 );
 
+// PATCH porque modificas parcialmente la clase grupal
+router.patch('/group-classes-cancel-reservation/:classId', 
+  authRequired, 
+  requireRole(['trainer', 'member']),
+  
+  cancelGroupClassReservation
+);
 export default router;
