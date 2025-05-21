@@ -1,0 +1,109 @@
+/* Styles/AssistantsListPage.css */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap');
+
+.assistant-page {
+  font-family: 'Oswald', sans-serif;
+  background-color: #fff;
+  color: #111;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Arial', sans-serif;
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #464646;
+}
+
+.class-name {
+  font-family: 'Oswald', sans-serif;
+  color: #072F5D;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.class-time {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color:#072F5D;
+  font-family: 'Oswald', sans-serif;
+}
+
+.class-details {
+  font-family: 'Oswald', sans-serif;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  color: #072F5D;
+}
+
+
+.capacity,
+.trainer {
+  color:#072F5D ;
+    font-family: 'Oswald', sans-serif;
+
+}
+
+.description {
+  color: #003366;
+  font-size: 0.95rem;
+  max-width: 600px;
+  margin: 0 auto 2rem auto;
+}
+
+.attendee-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+  text-align: left;
+    font-family: 'Oswald', sans-serif;
+
+}
+
+.attendee-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 700px;
+  text-align: left;
+    font-family: 'Oswald', sans-serif;
+color:#072F5D;
+}
+
+.attendee-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f3f4f6;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
+.attendee-item span {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.cancel-button {
+  background: none;
+  border: none;
+  color: red;
+  font-weight: bold;
+  cursor: pointer;
+}
