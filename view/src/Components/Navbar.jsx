@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext"; 
@@ -7,7 +7,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth(); 
 
-  console.log("Usuario en Navbar:", user);
+  useEffect(() => {
+    console.log("Usuario en Navbar:", user);
+  }, [user]);
 
   const handleRutinaClick = (e) => {
     e.preventDefault();
@@ -32,7 +34,19 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 w-full z-50 bg-black text-white flex justify-between items-center px-8 py-4 m-0">
       <span className="font-bold text-xl">GYMPRO</span>
       <div className="flex gap-6">
-        <a href="#" className="hover:text-gray-300">Home</a>
+        <a
+          href="/profile"
+          className="hover:text-gray-300"
+          onClick={(e) => {
+          e.preventDefault();
+          navigate("/profile");
+          if (window.location.pathname === "/profile") {
+            window.location.reload();
+          }
+        }}
+        >
+        Home
+        </a>
         <a
           href={`/my-workouts-by-day/${new Date().toISOString().split("T")[0]}`}
           className="hover:text-gray-300"
