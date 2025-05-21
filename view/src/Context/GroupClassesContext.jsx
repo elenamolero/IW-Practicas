@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { groupClassRequest } from "../api/class"; 
+import { groupClassRequest, reserveGroupClassRequest } from "../api/class"; 
 
 const GroupClassContext = createContext();
 
@@ -27,15 +27,6 @@ export const GroupClassProvider = ({ children }) => {
         return date.toISOString().split("T")[0];
       });
 
-      // Fechas de la semana anterior
-      const prevWeekStart = new Date(startOfWeek);
-      prevWeekStart.setDate(startOfWeek.getDate() - 7);
-      const prevWeekDates = Array.from({ length: 7 }, (_, i) => {
-        const date = new Date(prevWeekStart);
-        date.setDate(prevWeekStart.getDate() + i);
-        return date.toISOString().split("T")[0];
-      });
-
       // Pedir clases de la semana actual
       const classesByDay = await Promise.all(
         dates.map(async (date) => {
@@ -45,32 +36,8 @@ export const GroupClassProvider = ({ children }) => {
       );
       console.log("[GroupClassesContext] classesByDay:", classesByDay);
 
-      // Si hay días vacíos, pedir la semana anterior y copiar las clases si existen
-      const hasEmptyDays = classesByDay.some(day => !day.classes || day.classes.length === 0);
-      let prevWeekClasses = [];
-      if (hasEmptyDays) {
-        prevWeekClasses = await Promise.all(
-          prevWeekDates.map(async (date) => {
-            const response = await groupClassRequest(date);
-            return { date, classes: response.data.classes };
-          })
-        );
-        console.log("[GroupClassesContext] prevWeekClasses:", prevWeekClasses);
-      }
-
-      // Rellenar días vacíos con los de la semana anterior
-      const filledClasses = classesByDay.map((day, idx) => {
-        if (!day.classes || day.classes.length === 0) {
-          const prev = prevWeekClasses[idx];
-          return prev && prev.classes.length > 0
-            ? { ...day, classes: prev.classes }
-            : day;
-        }
-        return day;
-      });
-
-      setWeeklyClasses(filledClasses);
-      console.log("[GroupClassesContext] weeklyClasses set:", filledClasses);
+      setWeeklyClasses(classesByDay);
+      console.log("[GroupClassesContext] weeklyClasses set:", classesByDay);
     } catch (error) {
       console.error("[GroupClassesContext] Error al obtener las clases de la semana:", error);
     } finally {
@@ -79,8 +46,23 @@ export const GroupClassProvider = ({ children }) => {
     }
   };
 
+  // NUEVA FUNCIÓN PARA RESERVAR
+  const reserveGroupClass = async (classId) => {
+    try {
+      setLoading(true);
+      const response = await reserveGroupClassRequest(classId);
+      console.log("[GroupClassesContext] Reserva exitosa:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("[GroupClassesContext] Error al reservar clase:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Error en la reserva");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <GroupClassContext.Provider value={{ weeklyClasses, fetchClassesByWeek, loading }}>
+    <GroupClassContext.Provider value={{ weeklyClasses, fetchClassesByWeek, reserveGroupClass, loading }}>
       {children}
     </GroupClassContext.Provider>
   );

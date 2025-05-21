@@ -8,17 +8,17 @@ import "./Styles/WorkoutPage.css";
 const GroupClassesPage = () => {
   const { date } = useParams();
   const navigate = useNavigate();
-  const { weeklyClasses, fetchClassesByWeek, loading } = useGroupClass();
+  const { weeklyClasses, fetchClassesByWeek, reserveGroupClass, loading } = useGroupClass();
   const { user, loading: authLoading } = useAuth();
   const [selectedDate, setSelectedDate] = useState(date);
+  const [message, setMessage] = useState(null); 
+  const [messageType, setMessageType] = useState("success"); 
 
   useEffect(() => {
-    console.log("[GroupClassesPage] useEffect called with date:", date);
     if (date) {
       fetchClassesByWeek(date);
       setSelectedDate(date);
     }
-    // SOLO depende de date, no de fetchClassesByWeek
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
 
@@ -63,9 +63,33 @@ const GroupClassesPage = () => {
     ? new Date(selectedDate).toLocaleDateString("es-ES", { month: "long" })
     : "";
 
+  const handleReserve = async (classId) => {
+    try {
+      await reserveGroupClass(classId);
+      setMessage("Reserva realizada con éxito");
+      setMessageType("success");
+    } catch (error) {
+      setMessage(error.message || "Error al reservar la clase");
+      setMessageType("error");
+    }
+    setTimeout(() => setMessage(null), 1900);
+  };
+
   return (
     <div className="group-classes-page bg-white text-black min-h-screen p-6 pt-20">
       <Navbar />
+      {/* Mensaje flotante */}
+      {message && (
+        <div
+          className={`fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded shadow-lg z-50 text-lg font-semibold ${
+            messageType === "success"
+              ? "bg-green-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          {message}
+        </div>
+      )}
       <h1 className="text-center text-4xl font-bold mb-2">Clases Grupales</h1>
       <h2 className="text-center text-2xl font-semibold text-gray-600 mb-6">{month}</h2>
       {loading ? (
@@ -103,15 +127,36 @@ const GroupClassesPage = () => {
             </div>
             {/* Contenido de la tabla */}
             <div className="group-classes-content p-4">
-              {selectedClasses && selectedClasses.classes.length > 0 ? (
-                selectedClasses.classes.map((groupClass) => (
-                  <div key={groupClass._id} className="group-class-item mb-4 flex justify-between items-start border-b pb-4">
+             {selectedClasses && selectedClasses.classes.length > 0 ? (
+              selectedClasses.classes.map((groupClass) => {
+                const userId = String(user.id);
+                const isReservedByUser = Array.isArray(groupClass.attendees)
+                  ? groupClass.attendees.some(att => {
+                      if (att && typeof att === "object" && att._id) {
+                        return String(att._id) === userId;
+                      }
+                      return String(att) === userId;
+                    })
+                  : false;
+
+                // Comprobar si la clase es futura o actual
+                const now = new Date();
+                const classDate = new Date(groupClass.schedule);
+                const isFutureOrNow = classDate >= now;
+
+                return (
+                  <div
+                    key={groupClass._id}
+                    className="group-class-item mb-4 flex justify-between items-start border-b pb-4 transition-colors"
+                  >
                     <div className="group-class-info-left">
-                      <h3 className="font-bold text-lg">{groupClass.name}</h3>
+                      <h3 className="font-bold text-lg flex items-center">
+                        {groupClass.name}
+                      </h3>
                       <p className="text-sm text-gray-600">{groupClass.description}</p>
                       <p className="text-sm text-gray-600">
-                        Horario: {new Date(groupClass.schedule).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
-                      </p>
+                      Horario: {classDate.toISOString().slice(11, 16)} 
+                    </p>
                     </div>
                     <div className="group-class-info-right text-right flex flex-col items-end">
                       <p className="text-sm font-bold text-red-500 mb-2">
@@ -134,19 +179,33 @@ const GroupClassesPage = () => {
                           </>
                         )}
                         {/* Para miembro */}
-                        {user?.role === "member" && (
+                        {user?.role === "member" && isFutureOrNow && (
                           <>
-                            <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-xs">Asistentes</button>
+                            {isReservedByUser ? (
+                              <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded text-xs font-semibold cursor-not-allowed select-none">
+                                Reservada
+                              </span>
+                            ) : (
+                              <button
+                                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
+                                onClick={() => handleReserve(groupClass._id)}
+                              >
+                                Reservar
+                              </button>
+                            )}
                             <button className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-xs">Cancelar</button>
                           </>
                         )}
+                        {/* El botón de asistentes siempre visible */}
+                        <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-xs">Asistentes</button>
                       </div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">No hay clases para este día.</p>
-              )}
+                );
+              })
+            ) : (
+              <p className="text-sm text-gray-500">No hay clases para este día.</p>
+            )}
             </div>
           </div>
           {/* Flecha derecha */}
