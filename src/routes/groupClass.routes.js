@@ -8,7 +8,9 @@ import {
   deleteGroupClass, 
   getGroupClassSchedule ,
   getGroupClassesByDate,
-  cancelGroupClassReservation
+  cancelGroupClassReservation,
+  getMyUpcomingGroupClasses,
+  getMyUpcomingTrainerClasses
 } from '../controllers/groupClass.controller.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { createClassSchema, updateClassSchema } from '../Schemas/groupClass.schema.js';
@@ -79,4 +81,18 @@ router.patch('/group-classes-cancel-reservation/:classId',
   
   cancelGroupClassReservation
 );
+
+router.get(
+  "/my-upcoming-group-classes",
+  authRequired,
+  getMyUpcomingGroupClasses
+);
+
+router.get(
+  '/my-upcoming-trainer-classes',
+  authRequired,
+  requireRole(['trainer']),  // solo entrenadores
+  getMyUpcomingTrainerClasses
+);
+
 export default router;

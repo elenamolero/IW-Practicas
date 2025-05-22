@@ -413,3 +413,42 @@ export const cancelGroupClassReservation = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getMyUpcomingGroupClasses = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const classes = await GroupClass.find({
+      attendees: req.user.id,
+      schedule: { $gte: now }
+    })
+    .populate("assignedTrainer", "firstName")
+    .sort({ schedule: 1 });
+
+    res.json({ classes });
+  } catch (error) {
+    console.error("Error al obtener las próximas clases del usuario:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getMyUpcomingTrainerClasses = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const classes = await GroupClass.find({
+      assignedTrainer: req.user.id,
+      schedule: { $gte: now }
+    })
+      .populate("attendees", "firstName email") // opcional, puedes quitarlo si no necesitas mostrar asistentes
+      .sort({ schedule: 1 });
+
+    res.json({
+      message: "Próximas clases asignadas como entrenador obtenidas correctamente.",
+      classes
+    });
+  } catch (error) {
+    console.error("Error al obtener las clases como entrenador:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
