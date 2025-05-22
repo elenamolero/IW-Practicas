@@ -1,0 +1,32 @@
+.workout-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.workout-info-left {
+  max-width: 60%;
+}
+
+.workout-info-right {
+  text-align: right;
+  max-width: 40%;
+}
+
+.workout-info-right p {
+  margin: 2px 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.fixed {
+  position: fixed;
+}

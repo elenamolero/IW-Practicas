@@ -4,7 +4,8 @@ import {
   getUserWorkouts, 
   getWorkoutById, 
   updateWorkout, 
-  deleteWorkout 
+  deleteWorkout,
+  getUserWorkoutsByDate
 } from '../controllers/workout.controller.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { createWorkoutSchema, updateWorkoutSchema } from '../Schemas/workout.schema.js';
@@ -26,9 +27,18 @@ router.post(
 router.get(
   '/my-workouts',
   authRequired,
-  requireRole(['member']),
+  requireRole(['trainer', 'member']),
   getUserWorkouts
 );
+
+// Obtener todos los workouts del usuario en una fecha específica
+router.get(
+  '/my-workouts-by-day/:date',
+  authRequired,
+  requireRole(['trainer', 'member']),
+  getUserWorkoutsByDate
+);
+
 
 // Obtener un workout específico
 router.get(

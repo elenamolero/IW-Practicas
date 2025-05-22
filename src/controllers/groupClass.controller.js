@@ -6,6 +6,7 @@ export const createGroupClass = async (req, res) => {
 
     const {
       name,
+      description,
       schedule,
       maxCapacity,
       assignedTrainer,
@@ -72,6 +73,7 @@ export const createGroupClass = async (req, res) => {
     }
     const newClass = new GroupClass({
       name,
+      description,
       schedule: classSchedule,  // Guardamos la fecha ya convertida
       maxCapacity,
       assignedTrainer,
@@ -134,6 +136,7 @@ export const updateGroupClass = async (req, res) => {
     const { classId } = req.params;
     const {
       name,
+      description,
       schedule,
       maxCapacity,
       difficultyLevel,
@@ -215,6 +218,7 @@ export const updateGroupClass = async (req, res) => {
       classId,
       {
         name: name || groupClass.name,
+        description: description || groupClass.description,
         schedule: schedule ? new Date(schedule) : groupClass.schedule,
         maxCapacity: maxCapacity || groupClass.maxCapacity,
         difficultyLevel: difficultyLevel || groupClass.difficultyLevel,
@@ -343,6 +347,108 @@ export const getGroupClassSchedule = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al obtener el horario:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getGroupClassesByDate = async (req, res) => {
+  try {
+    const { date } = req.params; 
+
+    if (!date) {
+      return res.status(400).json({
+        message: "La fecha es requerida en el formato YYYY-MM-DD.",
+      });
+    }
+
+    const startOfDay = new Date(date);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const classes = await GroupClass.find({
+      schedule: { $gte: startOfDay, $lte: endOfDay },
+    })
+      .populate("assignedTrainer", "firstName")
+      .populate("attendees", "firstName")
+      .sort({ schedule: 1 });
+
+    res.json({
+      message: "Clases grupales obtenidas exitosamente.",
+      classes,
+    });
+  } catch (error) {
+    console.error("Error al obtener las clases grupales: ", error);
+    res.status(500).json({
+      message: "Error al obtener las clases grupales",
+      error: error.message,
+    });
+  }
+};
+
+export const cancelGroupClassReservation = async (req, res) => {
+  try {
+    const { classId } = req.params;
+
+    // Buscar la clase
+    const groupClass = await GroupClass.findById(classId);
+    if (!groupClass) {
+      return res.status(404).json({ message: "Clase grupal no encontrada" });
+    }
+
+    // Verificar si el usuario está en la lista de asistentes
+    const userIndex = groupClass.attendees.findIndex(
+      attendee => attendee.toString() === req.user.id
+    );
+    if (userIndex === -1) {
+      return res.status(400).json({ message: "No estás inscrito en esta clase" });
+    }
+
+    // Eliminar al usuario de la lista de asistentes
+    groupClass.attendees.splice(userIndex, 1);
+    await groupClass.save();
+
+    res.status(200).json({ message: "Reserva cancelada con éxito", class: groupClass });
+  } catch (error) {
+    console.error("Error al cancelar la reserva: ", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getMyUpcomingGroupClasses = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const classes = await GroupClass.find({
+      attendees: req.user.id,
+      schedule: { $gte: now }
+    })
+    .populate("assignedTrainer", "firstName")
+    .sort({ schedule: 1 });
+
+    res.json({ classes });
+  } catch (error) {
+    console.error("Error al obtener las próximas clases del usuario:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getMyUpcomingTrainerClasses = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const classes = await GroupClass.find({
+      assignedTrainer: req.user.id,
+      schedule: { $gte: now }
+    })
+      .populate("attendees", "firstName email") // opcional, puedes quitarlo si no necesitas mostrar asistentes
+      .sort({ schedule: 1 });
+
+    res.json({
+      message: "Próximas clases asignadas como entrenador obtenidas correctamente.",
+      classes
+    });
+  } catch (error) {
+    console.error("Error al obtener las clases como entrenador:", error);
     res.status(500).json({ message: error.message });
   }
 };

@@ -11,7 +11,8 @@ export const createWorkout = async (req, res) => {
       repetitions,
       rest,
       order,
-      intensity
+      intensity,
+      weigh
     } = req.body;
     
     const userId = req.user.id;
@@ -86,7 +87,8 @@ export const createWorkout = async (req, res) => {
       repetitions,
       rest,
       order,
-      intensity
+      intensity,
+      weigh
     });
     
     // Guardar el workout
@@ -102,6 +104,43 @@ export const createWorkout = async (req, res) => {
     res.status(500).json({ 
       message: "Error al crear el workout",
       error: error.message 
+    });
+  }
+};
+
+export const getUserWorkoutsByDate = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { date } = req.params; // Fecha proporcionada en la URL (YYYY-MM-DD)
+
+    if (!date) {
+      return res.status(400).json({
+        message: "La fecha es requerida en el formato YYYY-MM-DD.",
+      });
+    }
+
+    // Convertir la fecha proporcionada a un rango de inicio y fin del día
+    const startOfDay = new Date(date);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Obtener los workouts del usuario en el rango de la fecha especificada
+    const workouts = await Workout.find({
+      user_id: userId,
+      date: { $gte: startOfDay, $lte: endOfDay },
+    })
+      .populate("workoutType_id", "title description")
+      .sort({ date: -1, order: 1 });
+
+    res.json({
+      message: "Workouts obtenidos exitosamente.",
+      workouts,
+    });
+  } catch (error) {
+    console.error("Error al obtener los workouts: ", error);
+    res.status(500).json({
+      message: "Error al obtener los workouts",
+      error: error.message,
     });
   }
 };
@@ -175,7 +214,8 @@ export const updateWorkout = async (req, res) => {
       repetitions,
       rest,
       order,
-      intensity
+      intensity,
+      weigh
     } = req.body;
     
     // Verificar si el workout existe y pertenece al usuario
@@ -249,6 +289,7 @@ export const updateWorkout = async (req, res) => {
     workout.rest = rest || workout.rest;
     workout.order = order || workout.order;
     workout.intensity = intensity || workout.intensity;
+    workout.weigh = weigh || workout.weigh;
     
     await workout.save();
     
