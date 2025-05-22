@@ -47,11 +47,11 @@ export const createWorkout = async (req, res) => {
     }
     
     // Verificar que el tipo de workout pertenezca al usuario
-    if (workoutType.user_id.toString() !== userId) {
-      return res.status(403).json({ 
-        message: "No tienes permiso para crear un workout con este tipo de workout." 
-      });
-    }
+if (user.role !== "trainer" && workoutType.user_id.toString() !== userId) {
+  return res.status(403).json({ 
+    message: "No tienes permiso para crear un workout con este tipo de workout." 
+  });
+}
     
     const intensityScale = { min: 1, max: 10 };
     if (intensity < intensityScale.min || intensity > intensityScale.max) {
@@ -73,11 +73,11 @@ export const createWorkout = async (req, res) => {
       });
     }
     
-    if (user.role !== "member") {
-      return res.status(400).json({
-        message: "El usuario asociado con este workout debe tener el rol de 'member'."
-      });
-    }
+    if (user.role !== "member" && user.role !== "trainer") {
+  return res.status(400).json({
+    message: "Solo los usuarios con rol 'member' o 'trainer' pueden crear workouts."
+  });
+}
     
     // Crear el nuevo workout
     const newWorkout = new Workout({

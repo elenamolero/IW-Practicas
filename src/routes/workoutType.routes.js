@@ -17,7 +17,7 @@ const router = Router();
 router.post(
   '/create-workout-type',
   authRequired,
-  requireRole(['member']),
+  requireRole(['member', 'trainer']), // Solo los miembros y entrenadores pueden crear tipos de workout
   validateSchema(createWorkoutTypeSchema),
   createWorkoutType
 );
