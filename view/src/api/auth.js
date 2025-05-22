@@ -10,3 +10,15 @@ export const verifyTokenRequet = () => {
         withCredentials: true
     });
 };
+
+export const registerTrainer = async (formData) => {
+  const res = await axios.post(
+    "http://localhost:3000/api/register-trainer",
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+      withCredentials: true,
+    }
+  );
+  return res.data;
+};
