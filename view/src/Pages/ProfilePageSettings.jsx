@@ -5,22 +5,21 @@ import { useAuth } from "../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-
-
 const ProfilePageSettings = () => {
-
   const { user, isAuthenticated, logout: logoutFromContext } = useAuth();
   const navigate = useNavigate();
+
 
 const handleReceiptsNavigation = () => {
   navigate("/my-invoices"); // Asegúrate de que esta ruta coincida con la definida en tu router
 };
 
 const handleLogout = async () => {
+
     try {
       await axios.post("http://localhost:4000/api/logout", {}, { withCredentials: true });
-      logoutFromContext(); // limpia el usuario en el contexto
-      navigate("/login"); // redirige
+      logoutFromContext();
+      navigate("/login");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       alert("No se pudo cerrar sesión.");
@@ -28,25 +27,22 @@ const handleLogout = async () => {
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("¿Estás seguro de que quieres cancelar tu suscripción? Esta acción es irreversible.")) {
-      return;
-    }
-  
+    if (!window.confirm("¿Estás seguro de que quieres cancelar tu suscripción? Esta acción es irreversible.")) return;
+
     try {
       await axios.delete(`http://localhost:4000/api/delete-user/${user.email}`, {
         withCredentials: true
       });
-  
+
       alert("Tu cuenta ha sido eliminada correctamente.");
-      logoutFromContext();  // Limpia el estado del usuario
-      navigate("/");         // Redirige a home o login
+      logoutFromContext();
+      navigate("/");
     } catch (error) {
       console.error("Error al eliminar el usuario:", error);
       alert("Hubo un error al cancelar la suscripción.");
     }
   };
 
-  // Si no hay usuario cargado aún
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
@@ -54,8 +50,6 @@ const handleLogout = async () => {
       </div>
     );
   }
-
-
 
   return (
     <div className="min-h-screen bg-white text-black pt-20">
@@ -66,22 +60,16 @@ const handleLogout = async () => {
 
         {/* Imagen y datos */}
         <div className="flex flex-col md:flex-row gap-12 items-center">
-          {/* Imagen de perfil */}
           <div className="w-40 h-40 border-4 border-gray-300 rounded-lg flex items-center justify-center">
-          {user.photo ? (
-            <img
-            src={user.photo}
-            alt="Foto de perfil"
-            className="w-full h-full object-cover"
-            />
-          ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-200">
-            <FaUser className="text-6xl text-gray-400" />
-          </div>
-          )}
+            {user.photo ? (
+              <img src={user.photo} alt="Foto de perfil" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                <FaUser className="text-6xl text-gray-400" />
+              </div>
+            )}
           </div>
 
-          {/* Información del usuario */}
           <div className="text-left space-y-2 text-lg">
             <p><span className="font-semibold text-gray-800">Nombre:</span> {user.firstName}</p>
             <p><span className="font-semibold text-gray-800">Apellidos:</span> {user.lastName}</p>
@@ -98,17 +86,20 @@ const handleLogout = async () => {
           <button className="border border-blue-500 text-blue-500 px-4 py-2 rounded-full hover:bg-blue-100 transition">
             modificar datos
           </button>
+
           <button
             onClick={handleDeleteAccount}
             className="border border-red-500 text-red-500 px-4 py-2 rounded-full hover:bg-red-100 transition"
-            >
+          >
             cancelar suscripción
           </button>
+
           <button
            onClick={handleReceiptsNavigation}
            className="border border-green-600 text-green-700 px-4 py-2 rounded-full hover:bg-green-100 transition"
           >consultar recibos
           </button>
+
           <button
             onClick={handleLogout}
             className="border border-black text-black px-4 py-2 rounded-full hover:bg-gray-100 transition"
