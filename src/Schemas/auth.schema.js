@@ -110,15 +110,7 @@ export const registerSchema = z.object({
     }
   }
 
-  if (data.role === 'trainer') {
-    if (!data.classesCanTeach || data.classesCanTeach.length === 0) {
-      ctx.addIssue({
-        path: ['classesCanTeach'],
-        message: 'Debe indicar al menos una clase que puede impartir el trainer',
-        code: z.ZodIssueCode.custom
-      });
-    }
-  }
+  
 });
 
 export const loginSchema = z.object({
