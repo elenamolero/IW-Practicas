@@ -66,6 +66,10 @@ const invoiceSchema = new mongoose.Schema({
     address: {
       type: String,
       required: false
+    },
+    bankAccount: { // 🔧 AÑADIR ESTE CAMPO
+      type: String,
+      required: false
     }
   },
   

@@ -5,7 +5,8 @@ import {
   getReserveById, 
   updateReserve, 
   cancelReserve,
-  countCurrentReservationsByRoom
+  countCurrentReservationsByRoom,
+  countCurrentGymReservations
 } from '../controllers/muscleRoomReserve.controller.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { createMuscleRoomReserveSchema, updateMuscleRoomReserveSchema } from '../Schemas/muscleRoomReserve.schema.js';
@@ -57,6 +58,12 @@ router.delete(
   '/muscle-room-reserves/:reserveId',
   authRequired,
   cancelReserve
+);
+
+router.get(
+  "/current-gym-reservations",
+  authRequired,
+  countCurrentGymReservations
 );
 
 export default router; 

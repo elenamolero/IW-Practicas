@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useState } from "react";
-import { groupClassRequest } from "../api/class"; 
+import {
+  groupClassRequest,
+  reserveGroupClassRequest,
+  cancelGroupClassReservationRequest,
+  deleteGroupClassRequest,
+} from "../api/class";
 
 const GroupClassContext = createContext();
 
@@ -12,25 +17,17 @@ export const GroupClassProvider = ({ children }) => {
   const fetchClassesByWeek = async (startDate) => {
     try {
       setLoading(true);
-
       // Calcular el inicio de la semana (lunes)
       const inputDate = new Date(startDate);
       const dayOfWeek = inputDate.getDay();
-      const startOfWeek = new Date(inputDate.setDate(inputDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
+      const startOfWeek = new Date(
+        inputDate.setDate(inputDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1))
+      );
 
       // Fechas de lunes a domingo de la semana actual
       const dates = Array.from({ length: 7 }, (_, i) => {
         const date = new Date(startOfWeek);
         date.setDate(startOfWeek.getDate() + i);
-        return date.toISOString().split("T")[0];
-      });
-
-      // Fechas de la semana anterior
-      const prevWeekStart = new Date(startOfWeek);
-      prevWeekStart.setDate(startOfWeek.getDate() - 7);
-      const prevWeekDates = Array.from({ length: 7 }, (_, i) => {
-        const date = new Date(prevWeekStart);
-        date.setDate(prevWeekStart.getDate() + i);
         return date.toISOString().split("T")[0];
       });
 
@@ -42,39 +39,64 @@ export const GroupClassProvider = ({ children }) => {
         })
       );
 
-      // Si hay días vacíos, pedir la semana anterior y copiar las clases si existen
-      const hasEmptyDays = classesByDay.some(day => !day.classes || day.classes.length === 0);
-      let prevWeekClasses = [];
-      if (hasEmptyDays) {
-        prevWeekClasses = await Promise.all(
-          prevWeekDates.map(async (date) => {
-            const response = await groupClassRequest(date);
-            return { date, classes: response.data.classes };
-          })
-        );
-      }
-
-      // Rellenar días vacíos con los de la semana anterior
-      const filledClasses = classesByDay.map((day, idx) => {
-        if (!day.classes || day.classes.length === 0) {
-          const prev = prevWeekClasses[idx];
-          return prev && prev.classes.length > 0
-            ? { ...day, classes: prev.classes }
-            : day;
-        }
-        return day;
-      });
-
-      setWeeklyClasses(filledClasses);
+      setWeeklyClasses(classesByDay);
     } catch (error) {
-      console.error("Error al obtener las clases de la semana:", error);
+      console.error("[GroupClassesContext] Error al obtener las clases de la semana:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const reserveGroupClass = async (classId) => {
+    try {
+      setLoading(true);
+      const response = await reserveGroupClassRequest(classId);
+      return response.data;
+    } catch (error) {
+      console.error("[GroupClassesContext] Error al reservar clase:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Error en la reserva");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelGroupClassReservation = async (classId) => {
+    try {
+      setLoading(true);
+      const response = await cancelGroupClassReservationRequest(classId);
+      return response.data;
+    } catch (error) {
+      console.error("[GroupClassesContext] Error al cancelar reserva:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Error al cancelar la reserva");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteGroupClass = async (classId) => {
+    try {
+      setLoading(true);
+      const response = await deleteGroupClassRequest(classId);
+      return response.data;
+    } catch (error) {
+      console.error("[GroupClassesContext] Error al eliminar clase:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Error al eliminar la clase");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <GroupClassContext.Provider value={{ weeklyClasses, fetchClassesByWeek, loading }}>
+    <GroupClassContext.Provider
+      value={{
+        weeklyClasses,
+        fetchClassesByWeek,
+        reserveGroupClass,
+        cancelGroupClassReservation,
+        deleteGroupClass,
+        loading,
+      }}
+    >
       {children}
     </GroupClassContext.Provider>
   );

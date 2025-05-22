@@ -7,8 +7,12 @@ import { AuthProvider } from "./Context/AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
 import WorkoutPage from "./Pages/WorkoutPage";
 import { WorkoutProvider } from "./context/WorkoutContext";
-import GroupClassesPage from "./Pages/GroupClassesPage"; // importa tu página
-import { GroupClassProvider } from "./Context/GroupClassesContext"; // importa tu contexto
+import AssistantListPage from "./Pages/AssistantListPage"; 
+import GroupClassesPage from "./Pages/GroupClassesPage";
+import { GroupClassProvider } from "./Context/GroupClassesContext";
+import ProfilePageSettings from "./Pages/ProfilePageSettings";
+import ReceiptsListPage from "./Pages/ReceiptsListPage";
+import UserManagementPage from "./Pages/UserManagementPage";
 import CreateWorkoutPage from "./Pages/CreateWorkoutPage";
 
 function App() {
@@ -16,16 +20,20 @@ function App() {
     <AuthProvider>
       <WorkoutProvider>
         <GroupClassProvider>
-          <Routes>
+          <Routes>  
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route element={<ProtectedRoute />}>
-              <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             </Route>
+            <Route path="/profile-settings" element={<ProfilePageSettings />} />
             <Route path="/my-workouts-by-day/:date" element={<WorkoutPage />} />
             <Route path="/create-workout" element={<CreateWorkoutPage />} />
             <Route path="/group-classes-by-day/:date" element={<GroupClassesPage />} />
+            <Route path="/group-class/:id/attendees" element={<AssistantListPage />} />
+            <Route path="/my-invoices" element={<ReceiptsListPage />} />
+            <Route path="/user-manager" element={<UserManagementPage />} />
           </Routes>
         </GroupClassProvider>
       </WorkoutProvider>

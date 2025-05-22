@@ -1,0 +1,44 @@
+.receipts-page {
+  background-color: #fff;
+  min-height: 100vh;
+  padding-top: 80px;
+  font-family: "Arial", sans-serif;
+}
+
+.receipts-container {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.receipts-title {
+  font-size: 2rem;
+  margin-bottom: 30px;
+  font-weight: 600;
+  color: #333;
+}
+
+.receipts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.receipts-table th,
+.receipts-table td {
+  padding: 15px;
+  font-size: 1rem;
+}
+
+.receipts-table th {
+  background-color: #f5f5f5;
+  color: #0a2a57;
+  font-weight: bold;
+}
+
+.receipts-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.receipts-table td {
+  color: #1a1a1a;
+}

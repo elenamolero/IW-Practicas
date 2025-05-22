@@ -226,3 +226,23 @@ export const cancelReserve = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 }; 
+
+export const countCurrentGymReservations = async (req, res) => {
+  try {
+    const now = new Date();
+    const currentTime = now.toTimeString().slice(0, 5); // Formato "HH:MM"
+    const today = now.toISOString().split("T")[0];
+
+    const count = await MuscleRoomReserve.countDocuments({
+      date: today,
+      startTime: { $lte: currentTime },
+      endTime: { $gt: currentTime },
+      status: { $ne: "cancelled" }
+    });
+
+    res.json({ count });
+  } catch (error) {
+    console.error("Error al contar el aforo actual del gimnasio:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
