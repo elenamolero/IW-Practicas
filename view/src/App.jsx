@@ -11,6 +11,8 @@ import AssistantListPage from "./Pages/AssistantListPage";
 import GroupClassesPage from "./Pages/GroupClassesPage";
 import { GroupClassProvider } from "./Context/GroupClassesContext";
 import ProfilePageSettings from "./Pages/ProfilePageSettings";
+import ReceiptsListPage from "./Pages/ReceiptsListPage";
+
 
 function App() {
   return (
@@ -28,6 +30,7 @@ function App() {
             <Route path="/my-workouts-by-day/:date" element={<WorkoutPage />} />
             <Route path="/group-classes-by-day/:date" element={<GroupClassesPage />} />
             <Route path="/group-class/:id/attendees" element={<AssistantListPage />} />
+            <Route path="/my-invoices" element={<ReceiptsListPage />} />
           </Routes>
         </GroupClassProvider>
       </WorkoutProvider>
