@@ -9,8 +9,8 @@ function ReceiptsListPage() {
   useEffect(() => {
     const fetchReceipts = async () => {
       try {
-          const res = await fetch("http://localhost:4000/api/my-invoices", {
-          credentials: "include", 
+        const res = await fetch("http://localhost:4000/api/my-invoices", {
+          credentials: "include",
         });
 
         if (!res.ok) {
@@ -18,7 +18,7 @@ function ReceiptsListPage() {
         }
 
         const data = await res.json();
-        setReceipts(data); 
+        setReceipts(data); // contiene facturas con recipient.bankAccount
       } catch (err) {
         console.error("Error al cargar los recibos:", err);
       } finally {
@@ -44,24 +44,23 @@ function ReceiptsListPage() {
               <th>Cuenta bancaria</th>
             </tr>
           </thead>
-          <tbody>
-            {receipts.map((receipt, index) => (
-              <tr key={index}>
-                <td>
-                  {new Date(receipt.createdAt).toLocaleDateString("es-ES")}
-                </td>
-                <td>{receipt.amount.toFixed(2).replace(".", ",")}</td>
-                <td>{maskBankAccount(receipt.bankAccount)}</td>
-              </tr>
-            ))}
-          </tbody>
+        <tbody>
+             {receipts.map((receipt, index) => (
+            <tr key={receipt._id || index}>
+            <td>{new Date(receipt.createdAt).toLocaleDateString("es-ES")}</td>
+            <td>{receipt.total.toFixed(2).replace(".", ",")}</td>
+            <td>{maskBankAccount(receipt.issuer?.bankAccount)}</td>
+            </tr>
+                ))}
+        </tbody>
+
         </table>
       </div>
     </div>
   );
 }
 
-// Utilidad para ocultar parte del IBAN o número de cuenta
+// Función para enmascarar el IBAN o número de cuenta
 function maskBankAccount(account) {
   if (!account) return "****";
   const visible = account.slice(0, 8);
