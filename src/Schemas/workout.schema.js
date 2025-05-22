@@ -41,11 +41,7 @@ export const createWorkoutSchema = z.object({
 
   intensity: z.number({
     required_error: 'Intensity level is required',
-  }).min(1, {
-    message: 'Intensity must be at least 1',
-  }).max(10, {
-    message: 'Intensity cannot exceed 10',
-  }),
+  })
 });
 
 export const updateWorkoutSchema = z.object({
