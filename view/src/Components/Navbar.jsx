@@ -61,7 +61,7 @@ const Navbar = () => {
           Clases Grupales
         </a>
 
-        {/* 🔁 Aquí se muestra un enlace u otro según el rol */}
+        {/*  Aquí se muestra un enlace u otro según el rol */}
         {user?.role === "trainer" ? (
           <a
             href="/user-manager"
@@ -77,7 +77,16 @@ const Navbar = () => {
             Gestor de usuarios
           </a>
         ) : (
-          <a href="#" className="hover:text-gray-300">Sala de musculación</a>
+          <a
+            href="/muscle-room"
+            className="hover:text-gray-300"
+            onClick={(e) => {
+            e.preventDefault();
+            navigate("/muscle-room");
+            }}
+          >
+            Sala de musculación
+          </a>
         )}
       </div>
 
