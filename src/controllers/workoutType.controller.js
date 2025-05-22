@@ -7,17 +7,31 @@ export const createWorkoutType = async (req, res) => {
     const { title, description } = req.body;
     const userId = req.user.id;
 
-    // Buscar si ya existe un tipo de entrenamiento con el mismo título para este usuario
-    const existingWorkoutType = await WorkoutType.findOne({
-        title,
-        user_id: userId
-      });
+    console.log("Título recibido:", title);
+    console.log("Título normalizado:", title.trim());
+    console.log("User ID:", userId);
+    
+    // const existingWorkoutType = await WorkoutType.findOne({
+    //     title,
+    //     user_id: userId
+    //   });
       
-      if (existingWorkoutType) {
-        return res.status(400).json({
-          message: "Ya existe un tipo de entrenamiento con este título"
-        });
-      }
+    //   if (existingWorkoutType) {
+    //     return res.status(400).json({
+    //       message: "Ya existe un tipo de entrenamiento con este título"
+    //     });
+    //   }
+    const existingWorkoutType = await WorkoutType.findOne({
+      title: title.trim(), // opcionalmente normaliza el título
+      user_id: userId
+    });
+    
+    if (existingWorkoutType) {
+      return res.status(200).json({
+        message: "El tipo de entrenamiento ya existe",
+        workoutType: existingWorkoutType
+      });
+    }
   
       const newWorkoutType = await WorkoutType.create({
         title,
