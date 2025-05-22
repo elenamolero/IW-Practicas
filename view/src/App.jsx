@@ -6,7 +6,7 @@ import ProfilePage from "./Pages/ProfilePage";
 import { AuthProvider } from "./Context/AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
 import WorkoutPage from "./Pages/WorkoutPage";
-import { WorkoutProvider } from "./context/WorkoutContext";
+import { WorkoutProvider } from "./Context/WorkoutContext";
 import AssistantListPage from "./Pages/AssistantListPage"; 
 import GroupClassesPage from "./Pages/GroupClassesPage";
 import { GroupClassProvider } from "./Context/GroupClassesContext";

@@ -1,5 +1,6 @@
 import WorkoutType from '../models/workoutType.model.js';
 import User from "../models/user.model.js";
+import mongoose from "mongoose";
 
 // Crear un nuevo tipo de workout
 export const createWorkoutType = async (req, res) => {
@@ -11,27 +12,19 @@ export const createWorkoutType = async (req, res) => {
     console.log("Título normalizado:", title.trim());
     console.log("User ID:", userId);
     
-    // const existingWorkoutType = await WorkoutType.findOne({
-    //     title,
-    //     user_id: userId
-    //   });
-      
-    //   if (existingWorkoutType) {
-    //     return res.status(400).json({
-    //       message: "Ya existe un tipo de entrenamiento con este título"
-    //     });
-    //   }
-    const existingWorkoutType = await WorkoutType.findOne({
-      title: title.trim(), // opcionalmente normaliza el título
-      user_id: userId
-    });
+     const existingWorkoutType = await WorkoutType.findOne({
+         title: title.trim(),
+         user_id: new mongoose.Types.ObjectId(userId)
+       });
+
+       if (existingWorkoutType) {
+         return res.status(200).json({
+           message: "Ya existe un tipo de entrenamiento con este título",
+           workoutType: existingWorkoutType
+         });
+       }
     
-    if (existingWorkoutType) {
-      return res.status(200).json({
-        message: "El tipo de entrenamiento ya existe",
-        workoutType: existingWorkoutType
-      });
-    }
+
   
       const newWorkoutType = await WorkoutType.create({
         title,

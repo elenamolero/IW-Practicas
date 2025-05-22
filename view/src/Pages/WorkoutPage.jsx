@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useWorkout } from "../context/WorkoutContext";
+import { useWorkout } from "../Context/WorkoutContext";
 import Navbar from "../Components/Navbar";
 import "./Styles/WorkoutPage.css";
 
@@ -96,7 +96,7 @@ const WorkoutPage = () => {
                       <p className="text-sm">Series: {workout.series}</p>
                       <p className="text-sm">Repeticiones: {workout.repetitions}</p>
                       <p className="text-sm">Descanso: {workout.rest} segundos</p>
-                      <p className="text-sm">Peso: {workout.weigh} kg</p>
+                      <p className="text-sm">Peso: {workout.weight} kg</p>
                       <div className="flex justify-end gap-4 mt-2">
                         <button className="text-blue-500 hover:underline">Modificar</button>
                         <button className="text-red-500 hover:underline">Eliminar</button>
