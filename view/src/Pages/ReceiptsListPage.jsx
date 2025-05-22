@@ -49,7 +49,7 @@ function ReceiptsListPage() {
             <tr key={receipt._id || index}>
             <td>{new Date(receipt.createdAt).toLocaleDateString("es-ES")}</td>
             <td>{receipt.total.toFixed(2).replace(".", ",")}</td>
-            <td>{maskBankAccount(receipt.issuer?.bankAccount)}</td>
+            <td>{maskBankAccount(receipt.recipient?.bankAccount)}</td>
             </tr>
                 ))}
         </tbody>
