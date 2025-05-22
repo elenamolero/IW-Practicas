@@ -149,7 +149,7 @@ function ProfilePage() {
                         })}
                       </div>
                       <div className="text-sm text-gray-600">
-                        Entrenador: {cls.assignedTrainer?.firstName || "No asignado"}
+                        Entrenador: {user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "No asignado"}
                       </div>
                     </li>
                   ))}
