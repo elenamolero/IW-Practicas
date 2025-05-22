@@ -88,8 +88,8 @@ export const createWorkout = async (req, res) => {
       repetitions,
       rest,
       order,
-      intensity
-      // weigh
+      intensity,
+      weigh
     });
     
     // Guardar el workout
