@@ -245,3 +245,17 @@ export const verifyToken = async (req, res) => {
     });
   });
 };
+
+// Obtener todos los usuarios con rol 'member'
+export const getAllMembers = async (req, res) => {
+  try {
+    const members = await User.find({ role: 'member' }).select(
+      'email firstName lastName photo'
+    );
+
+    res.json(members);
+  } catch (error) {
+    console.error("Error al obtener los usuarios con rol 'member':", error);
+    res.status(500).json({ message: error.message });
+  }
+};

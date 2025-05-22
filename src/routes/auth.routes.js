@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {login,register,logout,profile,verifyToken, updateUser, getUserByEmail, deleteUser} from "../controllers/auth.controller.js";
+import {login,register,logout,profile,verifyToken, updateUser, getUserByEmail, deleteUser, getAllMembers} from "../controllers/auth.controller.js";
 import { authRequired } from '../Middlewares/validateToken.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { requireRole } from '../Middlewares/requireRole.middleware.js';
@@ -37,9 +37,17 @@ router.post(
     '/login',
     validateSchema(loginSchema),
     login);
+
+router.get(
+    '/members',
+    authRequired,
+    requireRole(['trainer']),
+    getAllMembers);
+    
 router.post('/logout',logout);
 router.get('/profile',verifyToken);
 router.get('/verify',authRequired,profile);
+
 
 
 //agregar a express 
