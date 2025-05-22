@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { workoutRequest } from "../api/workout";
+import { workoutRequest, createWorkoutRequest } from "../api/workout";
 
 const WorkoutContext = createContext();
 
@@ -73,8 +73,21 @@ export const WorkoutProvider = ({ children }) => {
     }
   };
 
+  // NUEVO: Crear workout desde el contexto
+  const createWorkout = async (workoutData) => {
+    try {
+      setLoading(true);
+      const response = await createWorkoutRequest(workoutData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <WorkoutContext.Provider value={{ weeklyWorkouts, fetchWorkoutsByWeek, loading }}>
+    <WorkoutContext.Provider value={{ weeklyWorkouts, fetchWorkoutsByWeek, createWorkout, loading }}>
       {children}
     </WorkoutContext.Provider>
   );

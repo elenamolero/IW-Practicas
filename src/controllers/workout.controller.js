@@ -13,6 +13,7 @@ export const createWorkout = async (req, res) => {
       order,
       intensity,
       weigh
+      
     } = req.body;
     
     const userId = req.user.id;
