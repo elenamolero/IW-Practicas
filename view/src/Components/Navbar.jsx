@@ -23,7 +23,6 @@ const Navbar = () => {
   const handleGroupClassesClick = (e) => {
     e.preventDefault();
     const today = new Date().toISOString().split("T")[0];
-    // Pasa el usuario como parámetro en el estado de navegación
     navigate(`/group-classes-by-day/${today}`, { state: { user } });
     if (window.location.pathname === `/group-classes-by-day/${today}`) {
       window.location.reload();
@@ -38,14 +37,14 @@ const Navbar = () => {
           href="/profile"
           className="hover:text-gray-300"
           onClick={(e) => {
-          e.preventDefault();
-          navigate("/profile");
-          if (window.location.pathname === "/profile") {
-            window.location.reload();
-          }
-        }}
+            e.preventDefault();
+            navigate("/profile");
+            if (window.location.pathname === "/profile") {
+              window.location.reload();
+            }
+          }}
         >
-        Home
+          Home
         </a>
         <a
           href={`/my-workouts-by-day/${new Date().toISOString().split("T")[0]}`}
@@ -61,16 +60,35 @@ const Navbar = () => {
         >
           Clases Grupales
         </a>
-        <a href="#" className="hover:text-gray-300">Sala de musculación</a>
+
+        {/* 🔁 Aquí se muestra un enlace u otro según el rol */}
+        {user?.role === "trainer" ? (
+          <a
+            href="/user-manager"
+            className="hover:text-gray-300"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/user-manager");
+              if (window.location.pathname === "/user-manager") {
+                window.location.reload();
+              }
+            }}
+          >
+            Gestor de usuarios
+          </a>
+        ) : (
+          <a href="#" className="hover:text-gray-300">Sala de musculación</a>
+        )}
       </div>
+
       <div className="flex items-center gap-2">
         <FaUser className="text-2xl" />
         {isAuthenticated && user && (
           <button
-          onClick={() => navigate("/profile-settings")}
-          className="text-sm font-semibold hover:underline"
-            >
-          {user.firstName || user.username || "Usuario"}
+            onClick={() => navigate("/profile-settings")}
+            className="text-sm font-semibold hover:underline"
+          >
+            {user.firstName || user.username || "Usuario"}
           </button>
         )}
       </div>
