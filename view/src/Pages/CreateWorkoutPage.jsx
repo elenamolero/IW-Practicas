@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import InputField from "../Components/InputField";
 import { FaDumbbell, FaInfoCircle, FaCalendarAlt } from "react-icons/fa";
-import { useWorkout } from "../context/WorkoutContext"; // Usa el contexto correcto
+import { useWorkout } from "../Context/WorkoutContext"; // Usa el contexto correcto
 
 function CreateWorkoutPage() {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ function CreateWorkoutPage() {
     intensity: "",
     series: "",
     repetitions: "",
-    weigh: "",
+    weight: "",
     rest: "",
     date: ""
   });
@@ -54,12 +54,16 @@ function CreateWorkoutPage() {
       body: JSON.stringify({ title: titleTrim, description: "Tipo creado desde CreateWorkoutPage" })
     });
     const data = await res.json();
-    return data.workoutType._id;
+    if (res.ok && data.workoutType && data.workoutType._id) {
+      return data.workoutType._id;
+    }
+  
+    throw new Error(data.message || "Error al obtener el tipo de workout");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.weigh || Number(formData.weigh) < 1)
+    if (!formData.weight || Number(formData.weight) < 1)
       return setNotification({ show: true, message: "Peso (kg) debe ser ≥ 1", type: "error" });
     if (!formData.order || Number(formData.order) < 0)
       return setNotification({ show: true, message: "El orden no puede ser negativo", type: "error" });
@@ -78,10 +82,22 @@ function CreateWorkoutPage() {
         intensity: Number(formData.intensity),
         series: Number(formData.series),
         repetitions: Number(formData.repetitions),
-        weigh: Number(formData.weigh),
+        weight: Number(formData.weight),
         rest: Number(formData.rest),
         date: dateOnly // solo la fecha, sin hora
       };
+      console.log("Workout a enviar al backend:", workoutToSend);
+      console.log("Tipos de datos:", {
+        order: typeof workoutToSend.order,
+        workoutTypeId: typeof workoutToSend.workoutTypeId,
+        description: typeof workoutToSend.description,
+        intensity: typeof workoutToSend.intensity,
+        series: typeof workoutToSend.series,
+        repetitions: typeof workoutToSend.repetitions,
+        weight: typeof workoutToSend.weight,
+        rest: typeof workoutToSend.rest,
+        date: typeof workoutToSend.date,
+      });
 
       await createWorkout(workoutToSend); // Usa el context aquí
 
@@ -93,7 +109,7 @@ function CreateWorkoutPage() {
         intensity: "",
         series: "",
         repetitions: "",
-        weigh: "",
+        weight: "",
         rest: "",
         date: ""
       });
@@ -241,9 +257,9 @@ function CreateWorkoutPage() {
             <div className="space-y-1">
               <label className="font-semibold text-[#072F5D]">Peso (kg)</label>
               <InputField
-                name="weigh"
+                name="weight"
                 type="number"
-                value={formData.weigh}
+                value={formData.weight}
                 onChange={handleChange}
                 required
               />

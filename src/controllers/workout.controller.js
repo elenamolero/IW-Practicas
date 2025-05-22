@@ -12,9 +12,11 @@ export const createWorkout = async (req, res) => {
       rest,
       order,
       intensity,
-      weigh
+      weight
       
     } = req.body;
+
+
     
     const userId = req.user.id;
     
@@ -23,6 +25,7 @@ export const createWorkout = async (req, res) => {
         message: "Todos los campos obligatorios deben estar completos."
       });
     }
+
     
     const workoutDate = new Date(date);
     console.log("Fecha recibida (date):", date);
@@ -47,7 +50,7 @@ export const createWorkout = async (req, res) => {
     }
     
     // Verificar que el tipo de workout pertenezca al usuario
-if (user.role !== "trainer" && workoutType.user_id.toString() !== userId) {
+  if (user.role !== "trainer" && workoutType.user_id.toString() !== userId) {
   return res.status(403).json({ 
     message: "No tienes permiso para crear un workout con este tipo de workout." 
   });
@@ -89,7 +92,7 @@ if (user.role !== "trainer" && workoutType.user_id.toString() !== userId) {
       rest,
       order,
       intensity,
-      weigh
+      weight
     });
     
     // Guardar el workout
@@ -216,7 +219,7 @@ export const updateWorkout = async (req, res) => {
       rest,
       order,
       intensity,
-      weigh
+      weight
     } = req.body;
     
     // Verificar si el workout existe y pertenece al usuario
@@ -290,7 +293,7 @@ export const updateWorkout = async (req, res) => {
     workout.rest = rest || workout.rest;
     workout.order = order || workout.order;
     workout.intensity = intensity || workout.intensity;
-    workout.weigh = weigh || workout.weigh;
+    workout.weight = weight || workout.weight;
     
     await workout.save();
     

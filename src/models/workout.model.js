@@ -41,11 +41,11 @@ const workoutSchema = new mongoose.Schema({
     min: 1,
     max: 10 // Scale of 1 to 10
   },
-  weigh: {
+  weight: {
     type: Number,
     required: true,
     min: 1,
-    max: 10 // Scale of 1 to 10
+    max: 1000 // Scale of 1 to 10
   }
 }, {
   timestamps: true

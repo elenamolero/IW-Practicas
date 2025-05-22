@@ -33,7 +33,7 @@ export const createWorkoutSchema = z.object({
     message: 'Order must be at least 1',
   }),
 
-  weigh: z.number({
+  weight: z.number({
     required_error: 'weigh is required',
   }).min(1, {
     message: 'weigh must be at least 1',
@@ -65,7 +65,7 @@ export const updateWorkoutSchema = z.object({
     message: 'Order must be at least 1',
   }).optional(),
 
-  weigh: z.number().min(1, {
+  weight: z.number().min(1, {
     message: 'Intensity must be at least 1',
   }).max(10, {
     message: 'Intensity cannot exceed 10',
