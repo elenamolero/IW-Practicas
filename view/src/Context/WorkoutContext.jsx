@@ -9,7 +9,7 @@ export const WorkoutProvider = ({ children }) => {
   const [weeklyWorkouts, setWeeklyWorkouts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchWorkoutsByWeek = async (startDate) => {
+  const fetchWorkoutsByWeek = async (startDate, userId = null) => {
     try {
       setLoading(true);
 
@@ -37,7 +37,7 @@ export const WorkoutProvider = ({ children }) => {
       // Pedir workouts de la semana actual
       const workoutsByDay = await Promise.all(
         dates.map(async (date) => {
-          const response = await workoutRequest(date);
+          const response = await workoutRequest(date, userId);
           return { date, workouts: response.data.workouts };
         })
       );
@@ -48,7 +48,7 @@ export const WorkoutProvider = ({ children }) => {
       if (hasEmptyDays) {
         prevWeekWorkouts = await Promise.all(
           prevWeekDates.map(async (date) => {
-            const response = await workoutRequest(date);
+            const response = await workoutRequest(date, userId);
             return { date, workouts: response.data.workouts };
           })
         );

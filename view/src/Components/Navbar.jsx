@@ -46,13 +46,29 @@ const Navbar = () => {
         >
           Home
         </a>
+        {user?.role === "trainer" ? (
+          <a
+          href="/trainer-routines"
+          className="hover:text-gray-300"
+          onClick={(e) => {
+          e.preventDefault();
+          navigate("/trainer-routines");
+          if (window.location.pathname === "/trainer-routines") {
+            window.location.reload();
+          }
+        }}
+        >
+        Rutinas
+        </a>
+        ) : (
         <a
           href={`/my-workouts-by-day/${new Date().toISOString().split("T")[0]}`}
           className="hover:text-gray-300"
           onClick={handleRutinaClick}
         >
-          Mi Rutina
+        Mi Rutina
         </a>
+        )}
         <a
           href={`/group-classes-by-day/${new Date().toISOString().split("T")[0]}`}
           className="hover:text-gray-300"

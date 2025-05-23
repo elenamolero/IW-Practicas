@@ -250,12 +250,35 @@ export const verifyToken = async (req, res) => {
 export const getAllMembers = async (req, res) => {
   try {
     const members = await User.find({ role: 'member' }).select(
-      'email firstName lastName photo'
+      '_id email firstName lastName photo'
     );
 
     res.json(members);
   } catch (error) {
     console.error("Error al obtener los usuarios con rol 'member':", error);
     res.status(500).json({ message: error.message });
+  }
+};
+
+
+// GET /api/member-workouts/:memberId?date=YYYY-MM-DD es para los trainer
+export const getMemberWorkoutsByDate = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const { date } = req.query;
+    const user = await User.findById(memberId);
+
+    if (!user || user.role !== 'member') {
+      return res.status(404).json({ message: "Miembro no encontrado" });
+    }
+
+    const workouts = await Workout.find({
+      user_id: memberId,
+      date: new Date(date),
+    }).populate('workoutType_id');
+
+    res.json(workouts);
+  } catch (error) {
+    res.status(500).json({ message: "Error al obtener workouts", error: error.message });
   }
 };

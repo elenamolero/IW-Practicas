@@ -112,9 +112,10 @@ export const createWorkout = async (req, res) => {
   }
 };
 
+//Obtener todos los workout de una fecha especifica
 export const getUserWorkoutsByDate = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.query.userId || req.user.id;
     const { date } = req.params; // Fecha proporcionada en la URL (YYYY-MM-DD)
 
     if (!date) {
