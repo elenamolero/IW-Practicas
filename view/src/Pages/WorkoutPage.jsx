@@ -3,19 +3,24 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useWorkout } from "../Context/WorkoutContext";
 import Navbar from "../Components/Navbar";
 import "./Styles/WorkoutPage.css";
+import { useLocation } from "react-router-dom";
 
 const WorkoutPage = () => {
   const { date } = useParams();
   const navigate = useNavigate();
   const { weeklyWorkouts, fetchWorkoutsByWeek, loading } = useWorkout();
   const [selectedDate, setSelectedDate] = useState(date);
+  const location = useLocation();
+  const initialUserId = location.state?.userId || null;
+  const [userId, setUserId] = useState(initialUserId);
+  const userIdFromTrainer = location.state?.userId;
 
   useEffect(() => {
     if (date) {
-      fetchWorkoutsByWeek(date);
+      fetchWorkoutsByWeek(date,userId);
       setSelectedDate(date);
     }
-  }, [date]);
+  }, [date, userIdFromTrainer]);
 
   const handleDateClick = (date) => {
     setSelectedDate(date);
@@ -26,14 +31,18 @@ const WorkoutPage = () => {
     const current = new Date(date);
     current.setDate(current.getDate() - 7);
     const prevWeek = current.toISOString().split("T")[0];
-    navigate(`/my-workouts-by-day/${prevWeek}`);
+    navigate(`/my-workouts-by-day/${prevWeek}`,{
+      state: { userId }
+    });
   };
 
   const goToNextWeek = () => {
     const current = new Date(date);
     current.setDate(current.getDate() + 7);
     const nextWeek = current.toISOString().split("T")[0];
-    navigate(`/my-workouts-by-day/${nextWeek}`);
+    navigate(`/my-workouts-by-day/${nextWeek}`, {
+      state: { userId }
+    });
   };
 
   const handleDelete = async (workoutId) => {

@@ -17,6 +17,8 @@ import MuscleRoomPage from "./Pages/MuscleRoomPage";
 import CreateWorkoutPage from "./Pages/CreateWorkoutPage";
 import RegisterTrainerPage from "./Pages/RegisterTrainerPage";
 import EditWorkoutPage from "./Pages/EditWorkoutPage";
+import TrainerRoutinesPage from "./Pages/TrainerRoutinesPage";
+
 
 
 function App() {
@@ -41,6 +43,7 @@ function App() {
             <Route path="/user-manager" element={<UserManagementPage />} />
             <Route path="/muscle-room" element={<MuscleRoomPage />} />
             <Route path="/register-trainer" element={<RegisterTrainerPage />} />
+            <Route path="/trainer-routines" element={<TrainerRoutinesPage />} />
           </Routes>
         </GroupClassProvider>
       </WorkoutProvider>
