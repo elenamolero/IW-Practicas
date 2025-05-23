@@ -3,7 +3,6 @@ import User from "../models/user.model.js";
 
 export const createGroupClass = async (req, res) => {
   try {
-
     const {
       name,
       description,
@@ -14,20 +13,30 @@ export const createGroupClass = async (req, res) => {
       attendees
     } = req.body;
 
-
     if (!name || !schedule) {
       return res.status(400).json({
         message: "Name and scheadule are a must."
       });
     }
 
-
-    const classSchedule = new Date(schedule);
-
+    // Ajuste: tratar el string de schedule como local y convertirlo a UTC
+    // Esto asegura que la hora guardada sea la que el usuario seleccionó en su zona local
+    const [datePart, timePart] = schedule.split("T");
+    const [year, month, day] = datePart.split("-");
+    const [hour, minute] = timePart.split(":");
+    const classSchedule = new Date(
+      Date.UTC(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        Number(hour),
+        Number(minute)
+      )
+    );
 
     if (isNaN(classSchedule.getTime())) {
       return res.status(400).json({
-        message: "Scheadule not valid. Format: YYYY-MM-DDTHH:mm:ss."
+        message: "Scheadule not valid. Format: YYYY-MM-DDTHH:mm."
       });
     }
     if (maxCapacity && isNaN(maxCapacity)) {
@@ -52,25 +61,22 @@ export const createGroupClass = async (req, res) => {
       return res.status(400).json({ message: "User asigned is not a trainer." });
     }
     const classEndTime = new Date(classSchedule.getTime() + 60 * 60 * 1000); // 1 hora
-    console.log("end date:", classEndTime);
     const existingClasses = await GroupClass.find({});
     const overlappingClass = existingClasses.find(existingClass => {
       const existingClassEndTime = new Date(existingClass.schedule.getTime() + 60 * 60 * 1000);
 
       return (
-        (classSchedule < existingClassEndTime && classEndTime > existingClass.schedule) ||  
-        (classSchedule >= existingClass.schedule && classSchedule < existingClassEndTime)  
+        (classSchedule < existingClassEndTime && classEndTime > existingClass.schedule) ||
+        (classSchedule >= existingClass.schedule && classSchedule < existingClassEndTime)
       );
     });
 
     if (overlappingClass) {
-      console.log("solapated class found:", overlappingClass);
       return res.status(400).json({
         message: "already exit a class with the same schedule.",
       });
-    } else {
-      console.log("class can be created.");
     }
+
     const newClass = new GroupClass({
       name,
       description,
@@ -78,7 +84,7 @@ export const createGroupClass = async (req, res) => {
       maxCapacity,
       assignedTrainer,
       difficultyLevel,
-      attendees: attendees || []  // Si no hay asistentes, se asigna un arreglo vacío
+      attendees: attendees || []
     });
     const savedClass = await newClass.save();
     res.status(201).json({
@@ -90,7 +96,6 @@ export const createGroupClass = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 export const cancelGroupClass = async (req, res) => {
   try {
     const { classId } = req.params;

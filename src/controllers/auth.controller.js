@@ -260,6 +260,19 @@ export const getAllMembers = async (req, res) => {
   }
 };
 
+export const getAllTrainers = async (req, res) => {
+  try {
+    const trainers = await User.find({ role: 'trainer' }).select(
+      '_id email firstName lastName photo'
+    );
+
+    res.json(trainers);
+  } catch (error) {
+    console.error("Error al obtener los usuarios con rol 'trainer':", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 // GET /api/member-workouts/:memberId?date=YYYY-MM-DD es para los trainer
 export const getMemberWorkoutsByDate = async (req, res) => {

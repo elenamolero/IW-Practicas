@@ -1,15 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import InputField from "../Components/InputField";
 import { FaUsers, FaInfoCircle, FaCalendarAlt, FaUserTie } from "react-icons/fa";
-import { useGroupClass } from "../Context/GroupClassesContext"; // Asegúrate de tener este context
+import { useGroupClass } from "../Context/GroupClassesContext";
+import { useAuth } from "../Context/AuthContext"; // Importa el contexto de Auth
 
 function CreateGroupClassPage() {
   const navigate = useNavigate();
-  const { createGroupClass } = useGroupClass(); // Debes tener este método en tu context
+  const { createGroupClass } = useGroupClass();
+  const { getAllTrainers } = useAuth(); // Usa el método del contexto Auth
 
-  // ======= Estado =========
+  // Estado para entrenadores
+  const [trainers, setTrainers] = useState([]);
+  const [loadingTrainers, setLoadingTrainers] = useState(true);
+
+  // Estado del formulario
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -21,13 +27,27 @@ function CreateGroupClassPage() {
 
   const [notification, setNotification] = useState({ show: false, message: "", type: "success" });
 
-  // ======= Handlers =========
+  // Cargar entrenadores al montar
+ useEffect(() => {
+  async function fetchTrainers() {
+    try {
+      setLoadingTrainers(true);
+      const data = await getAllTrainers();
+      setTrainers(data);
+    } catch (err) {
+      setTrainers([]);
+    } finally {
+      setLoadingTrainers(false);
+    }
+  }
+  fetchTrainers();
+}, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Validar que la fecha no sea pasada
   const isDateValid = (dateStr) => {
     if (!dateStr) return false;
     const selected = new Date(dateStr);
@@ -76,7 +96,6 @@ function CreateGroupClassPage() {
   const pad = (n) => n.toString().padStart(2, "0");
   const minDateTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
-  // ======= UI =========
   return (
     <div className="relative min-h-screen flex flex-col items-center bg-white text-gray-900 overflow-x-hidden">
       <Navbar />
@@ -138,14 +157,14 @@ function CreateGroupClassPage() {
           <div className="space-y-1">
             <label className="font-semibold text-[#072F5D]">Fecha y hora</label>
             <InputField
-              name="schedule"
-              type="datetime-local"
-              min={minDateTime}
-              value={formData.schedule}
-              onChange={handleChange}
-              icon={<FaCalendarAlt className="text-[#072F5D]" />}
-              required
-            />
+            name="schedule"
+            type="datetime-local"
+            min={minDateTime}
+            value={formData.schedule}
+            onChange={handleChange}
+            icon={<FaCalendarAlt className="text-[#072F5D]" />}
+            required
+/>
           </div>
 
           {/* CAPACIDAD */}
@@ -161,15 +180,29 @@ function CreateGroupClassPage() {
           />
 
           {/* ENTRENADOR ASIGNADO */}
-          <InputField
-            label={<span className="font-semibold text-[#072F5D]">Entrenador asignado (ID)</span>}
-            name="assignedTrainer"
-            placeholder="ID del entrenador"
-            value={formData.assignedTrainer}
-            onChange={handleChange}
-            icon={<FaUserTie className="text-[#072F5D]" />}
-            required
-          />
+          <div className="space-y-1">
+            <label className="font-semibold text-[#072F5D]">Entrenador asignado</label>
+            <div className="relative">
+              <select
+                name="assignedTrainer"
+                value={formData.assignedTrainer}
+                onChange={handleChange}
+                className="w-full rounded-full py-4 px-6 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
+                required
+                disabled={loadingTrainers}
+              >
+                <option value="" disabled>
+                  {loadingTrainers ? "Cargando entrenadores..." : "Selecciona un entrenador"}
+                </option>
+                {trainers.map((trainer) => (
+                  <option key={trainer._id} value={trainer._id}>
+                    {trainer.firstName} {trainer.lastName}
+                  </option>
+                ))}
+              </select>
+              <FaUserTie className="absolute right-6 top-1/2 -translate-y-1/2 text-[#072F5D]" />
+            </div>
+          </div>
 
           {/* DIFICULTAD */}
           <div className="space-y-1">
