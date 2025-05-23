@@ -18,6 +18,7 @@ import CreateWorkoutPage from "./Pages/CreateWorkoutPage";
 import RegisterTrainerPage from "./Pages/RegisterTrainerPage";
 import EditWorkoutPage from "./Pages/EditWorkoutPage";
 import TrainerRoutinesPage from "./Pages/TrainerRoutinesPage";
+import EditUserPage from "./Pages/EditUserPage";
 
 
 
@@ -44,6 +45,7 @@ function App() {
             <Route path="/muscle-room" element={<MuscleRoomPage />} />
             <Route path="/register-trainer" element={<RegisterTrainerPage />} />
             <Route path="/trainer-routines" element={<TrainerRoutinesPage />} />
+            <Route path="/edit-user" element={<EditUserPage />} />
           </Routes>
         </GroupClassProvider>
       </WorkoutProvider>
