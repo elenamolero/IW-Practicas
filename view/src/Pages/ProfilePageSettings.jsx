@@ -11,7 +11,7 @@ const ProfilePageSettings = () => {
 
 
 const handleReceiptsNavigation = () => {
-  navigate("/my-invoices"); // Asegúrate de que esta ruta coincida con la definida en tu router
+  navigate("/my-invoices"); 
 };
 
 const handleLogout = async () => {
@@ -91,14 +91,17 @@ const handleLogout = async () => {
             onClick={handleDeleteAccount}
             className="border border-red-500 text-red-500 px-4 py-2 rounded-full hover:bg-red-100 transition"
           >
-            cancelar suscripción
+          {user.role === "trainer" ? "borrar cuenta" : "cancelar suscripción"}
           </button>
 
+          {user.role === "member" && (
           <button
-           onClick={handleReceiptsNavigation}
-           className="border border-green-600 text-green-700 px-4 py-2 rounded-full hover:bg-green-100 transition"
-          >consultar recibos
+            onClick={handleReceiptsNavigation}
+            className="border border-green-600 text-green-700 px-4 py-2 rounded-full hover:bg-green-100 transition"
+            >
+          consultar recibos
           </button>
+          )}
 
           <button
             onClick={handleLogout}
