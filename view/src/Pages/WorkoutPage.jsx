@@ -36,6 +36,25 @@ const WorkoutPage = () => {
     navigate(`/my-workouts-by-day/${nextWeek}`);
   };
 
+  const handleDelete = async (workoutId) => {
+    if (!window.confirm("¿Estás seguro de que quieres eliminar este workout?")) return;
+  
+    try {
+      const res = await fetch(`http://localhost:4000/api/workouts/${workoutId}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+  
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+  
+      alert("Workout eliminado correctamente");
+      fetchWorkoutsByWeek(selectedDate); // Refresca la lista
+    } catch (err) {
+      alert("Error al eliminar el workout: " + err.message);
+    }
+  };
+
   const selectedWorkouts = weeklyWorkouts.find((day) => day.date === selectedDate);
 
   const month = selectedDate
@@ -98,8 +117,18 @@ const WorkoutPage = () => {
                       <p className="text-sm">Descanso: {workout.rest} segundos</p>
                       <p className="text-sm">Peso: {workout.weight} kg</p>
                       <div className="flex justify-end gap-4 mt-2">
-                        <button className="text-blue-500 hover:underline">Modificar</button>
-                        <button className="text-red-500 hover:underline">Eliminar</button>
+                        <button
+                          className="text-blue-500 hover:underline"
+                          onClick={() => navigate(`/edit-workout/${workout._id}`)}
+                        >
+                        Modificar
+                        </button>
+                        <button
+                          className="text-red-500 hover:underline"
+                          onClick={() => handleDelete(workout._id)}
+                        >
+                        Eliminar
+                        </button>
                       </div>
                     </div>
                   </div>
