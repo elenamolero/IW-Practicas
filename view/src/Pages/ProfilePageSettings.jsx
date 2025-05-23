@@ -83,9 +83,13 @@ const handleLogout = async () => {
 
         {/* Botones de acciones */}
         <div className="flex flex-wrap justify-center gap-6 mt-12">
-          <button className="border border-blue-500 text-blue-500 px-4 py-2 rounded-full hover:bg-blue-100 transition">
-            modificar datos
+          <button
+            onClick={() => navigate("/edit-user")}
+            className="border border-blue-500 text-blue-500 px-4 py-2 rounded-full hover:bg-blue-100 transition"
+          >
+          modificar datos
           </button>
+
 
           <button
             onClick={handleDeleteAccount}
