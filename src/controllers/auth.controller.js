@@ -8,30 +8,20 @@ import { TOKEN_SECRET } from "../config.js";
 export const deleteUser = async (req, res) => {
   try {
     const { email } = req.params;
-
     const userFound = await User.findOneAndDelete({ email });
-
-    if (!userFound) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
-
+    if (!userFound) return res.status(404).json({ message: "Usuario no encontrado" });
     res.json({ message: `Usuario con email ${email} eliminado correctamente.` });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-//getuser by email
+// get user by email
 export const getUserByEmail = async (req, res) => {
   const { email } = req.params;
-
   try {
     const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
-
+    if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
     res.json({
       id: user._id,
       email: user.email,
@@ -47,30 +37,22 @@ export const getUserByEmail = async (req, res) => {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-
-//modificar user
+// update user
 export const updateUser = async (req, res) => {
   try {
     const { email, _id, id, ...updateData } = req.body;
-
     if (!email) return res.status(400).json({ message: "Se requiere el email para identificar al usuario" });
-
-    // Buscar al usuario por su email
     const userFound = await User.findOne({ email });
     if (!userFound) return res.status(404).json({ message: "Usuario no encontrado" });
-
-    // Actualizar datos (sin modificar email ni id)
     const userUpdated = await User.findByIdAndUpdate(userFound._id, updateData, {
       new: true,
       runValidators: true
     });
-
     res.json({
       id: userUpdated._id,
       email: userUpdated.email,
@@ -90,32 +72,21 @@ export const updateUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// REGISTRO
 
-
+// register
 export const register = async (req, res) => {
   try {
     const {
-      email,
-      password,
-      firstName,
-      lastName,
-      phone,
-      role,
-      bankAccount,
-      weight,
-      height,
-      classesCanTeach,
-      photo, // Aceptar la URL de la foto desde el cuerpo
+      email, password, firstName, lastName, phone, role,
+      bankAccount, weight, height, classesCanTeach, photo
     } = req.body;
 
     const userFound = await User.findOne({ email });
     if (userFound) return res.status(400).json(['El email ya está en uso']);
 
-    // Subir la foto si se envía como archivo
-    let photoUrl = photo || null; // Usar la URL del cuerpo si no se sube un archivo
+    let photoUrl = photo || null;
     if (req.file) {
-      photoUrl = req.file.path; // URL de la foto subida a Cloudinary
+      photoUrl = req.file.path;
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -126,7 +97,7 @@ export const register = async (req, res) => {
       firstName,
       lastName,
       phone,
-      photo: photoUrl, // Guardar la URL de la foto
+      photo: photoUrl,
       role,
       bankAccount: role === 'member' ? bankAccount : undefined,
       weight: role === 'member' ? weight : undefined,
@@ -137,14 +108,20 @@ export const register = async (req, res) => {
     const userSaved = await newUser.save();
     const token = await createAccessToken({ id: userSaved._id, role: userSaved.role });
 
-    res.cookie('token', token, { httpOnly: true });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      maxAge: 5* 60 * 1000
+    });
+
     res.json({
       id: userSaved._id,
       email: userSaved.email,
       firstName: userSaved.firstName,
       lastName: userSaved.lastName,
       role: userSaved.role,
-      photo: userSaved.photo, // URL de la foto
+      photo: userSaved.photo,
       createdAt: userSaved.createdAt,
       updatedAt: userSaved.updatedAt,
     });
@@ -153,10 +130,9 @@ export const register = async (req, res) => {
   }
 };
 
-// LOGIN
+// login
 export const login = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const userFound = await User.findOne({ email });
     if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
@@ -166,45 +142,44 @@ export const login = async (req, res) => {
 
     const token = await createAccessToken({ id: userFound._id, role: userFound.role });
 
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      maxAge:  5* 60 * 1000
+    });
 
-    res.cookie('token', token, { httpOnly: true });
     res.json({
       id: userFound._id,
       email: userFound.email,
       firstName: userFound.firstName,
       lastName: userFound.lastName,
       role: userFound.role,
-        phone: userFound.phone,
-        photo: userFound.photo,
-        bankAccount: userFound.bankAccount,
-        weight: userFound.weight,
-        height: userFound.height,
-        classesCanTeach: userFound.classesCanTeach,
-
+      phone: userFound.phone,
+      photo: userFound.photo,
+      bankAccount: userFound.bankAccount,
+      weight: userFound.weight,
+      height: userFound.height,
+      classesCanTeach: userFound.classesCanTeach,
       createdAt: userFound.createdAt,
       updatedAt: userFound.updatedAt,
-
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// LOGOUT
+// logout
 export const logout = (req, res) => {
-  res.cookie('token', "", {
-    expires: new Date(0)
-  });
+  res.cookie('token', "", { expires: new Date(0) });
   return res.sendStatus(200);
 };
 
-// PROFILE
+// profile
 export const profile = async (req, res) => {
   try {
     const userFound = await User.findById(req.user.id);
     if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
-
     return res.json({
       id: userFound._id,
       email: userFound.email,
@@ -225,7 +200,7 @@ export const profile = async (req, res) => {
   }
 };
 
-// VERIFY TOKEN
+// verify token
 export const verifyToken = async (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.status(401).json({ message: "Unauthorized" });
@@ -246,13 +221,12 @@ export const verifyToken = async (req, res) => {
   });
 };
 
-// Obtener todos los usuarios con rol 'member'
+// get all members
 export const getAllMembers = async (req, res) => {
   try {
     const members = await User.find({ role: 'member' }).select(
       '_id email firstName lastName photo'
     );
-
     res.json(members);
   } catch (error) {
     console.error("Error al obtener los usuarios con rol 'member':", error);
@@ -260,12 +234,12 @@ export const getAllMembers = async (req, res) => {
   }
 };
 
+// get all trainers
 export const getAllTrainers = async (req, res) => {
   try {
     const trainers = await User.find({ role: 'trainer' }).select(
       '_id email firstName lastName photo'
     );
-
     res.json(trainers);
   } catch (error) {
     console.error("Error al obtener los usuarios con rol 'trainer':", error);
@@ -273,23 +247,19 @@ export const getAllTrainers = async (req, res) => {
   }
 };
 
-
-// GET /api/member-workouts/:memberId?date=YYYY-MM-DD es para los trainer
+// get member workouts by date
 export const getMemberWorkoutsByDate = async (req, res) => {
   try {
     const { memberId } = req.params;
     const { date } = req.query;
     const user = await User.findById(memberId);
-
     if (!user || user.role !== 'member') {
       return res.status(404).json({ message: "Miembro no encontrado" });
     }
-
     const workouts = await Workout.find({
       user_id: memberId,
       date: new Date(date),
     }).populate('workoutType_id');
-
     res.json(workouts);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener workouts", error: error.message });
