@@ -4,6 +4,7 @@ import {
   reserveGroupClassRequest,
   cancelGroupClassReservationRequest,
   deleteGroupClassRequest,
+  createGroupClassRequest, // <-- Asegúrate de tener esta función en tu api/class.js
 } from "../api/class";
 
 const GroupClassContext = createContext();
@@ -42,6 +43,18 @@ export const GroupClassProvider = ({ children }) => {
       setWeeklyClasses(classesByDay);
     } catch (error) {
       console.error("[GroupClassesContext] Error al obtener las clases de la semana:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createGroupClass = async (classData) => {
+    try {
+      setLoading(true);
+      const response = await createGroupClassRequest(classData);
+      return response.data;
+    } catch (error) {
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -91,6 +104,7 @@ export const GroupClassProvider = ({ children }) => {
       value={{
         weeklyClasses,
         fetchClassesByWeek,
+        createGroupClass, // <-- Añadido aquí
         reserveGroupClass,
         cancelGroupClassReservation,
         deleteGroupClass,
