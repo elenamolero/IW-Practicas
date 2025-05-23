@@ -22,3 +22,6 @@ export const registerTrainer = async (formData) => {
   );
   return res.data;
 };
+
+export const getAllTrainersRequest = () =>
+  axios.get("http://localhost:4000/api/trainers", { withCredentials: true });

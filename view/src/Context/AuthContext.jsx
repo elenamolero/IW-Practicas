@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { registerRequest, loginRequest, verifyTokenRequet } from '../api/auth.js';
+import { registerRequest, loginRequest, verifyTokenRequet, getAllTrainersRequest } from '../api/auth.js';
+
 import Cookies from "js-cookie";
 export const AuthContext = createContext();
 
@@ -15,35 +16,35 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [errors, setErrors] = useState([]);
-    const [loading, setLoading] = useState(true); // <-- Consistente aquí
+    const [loading, setLoading] = useState(true);
 
-  const signup = async (user) => {
-    try {
-        const res = await registerRequest(user);
-        setUser(res.data);
-        setIsAuthenticated(true);
-        setLoading(false); // <-- Añade esto
-    } catch (error) {
-        setErrors(error.response.data);
-        setLoading(false); // <-- Añade esto
-    }
-};
-
-const signin = async (user) => {
-    try {
-        const res = await loginRequest(user)
-        setIsAuthenticated(true);
-        setUser(res.data);
-        setLoading(false); // <-- Añade esto
-    } catch (error) {
-        if (Array.isArray(error.response.data)) {
-            setErrors(error.response.data)
-        } else {
-            setErrors([error.response.data.message])
+    const signup = async (user) => {
+        try {
+            const res = await registerRequest(user);
+            setUser(res.data);
+            setIsAuthenticated(true);
+            setLoading(false);
+        } catch (error) {
+            setErrors(error.response.data);
+            setLoading(false);
         }
-        setLoading(false); // <-- Añade esto
-    }
-};
+    };
+
+    const signin = async (user) => {
+        try {
+            const res = await loginRequest(user)
+            setIsAuthenticated(true);
+            setUser(res.data);
+            setLoading(false);
+        } catch (error) {
+            if (Array.isArray(error.response.data)) {
+                setErrors(error.response.data)
+            } else {
+                setErrors([error.response.data.message])
+            }
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         if (errors.length > 0) {
@@ -58,7 +59,7 @@ const signin = async (user) => {
         Cookies.remove("token");
         setIsAuthenticated(false);
         setUser(null);
-        setLoading(false); // <-- Añadido para evitar loading infinito tras logout
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -76,10 +77,23 @@ const signin = async (user) => {
                 setIsAuthenticated(false);
                 setUser(null);
             }
-            setLoading(false); // <-- SOLO aquí, después de comprobar el usuario
+            setLoading(false);
         }
         checkLogin();
     }, []);
+
+    // NUEVO: Obtener todos los trainers
+    const getAllTrainers = async () => {
+        try {
+            setLoading(true);
+            const response = await getAllTrainersRequest();
+            return response.data;
+        } catch (error) {
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <AuthContext.Provider value={{
@@ -90,7 +104,8 @@ const signin = async (user) => {
             user,
             setUser,
             isAuthenticated,
-            errors
+            errors,
+            getAllTrainers // <-- Añadido aquí
         }}>
             {children}
         </AuthContext.Provider>

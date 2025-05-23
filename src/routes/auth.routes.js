@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {login,register,logout,profile,verifyToken, updateUser, getUserByEmail, deleteUser, getAllMembers, getMemberWorkoutsByDate} from "../controllers/auth.controller.js";
+import {login,register,logout,profile,verifyToken, updateUser, getUserByEmail, deleteUser, getAllMembers, getMemberWorkoutsByDate, getAllTrainers} from "../controllers/auth.controller.js";
 import { authRequired } from '../Middlewares/validateToken.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { requireRole } from '../Middlewares/requireRole.middleware.js';
@@ -43,6 +43,12 @@ router.get(
     authRequired,
     requireRole(['trainer']),
     getAllMembers);
+
+router.get(
+    '/trainers',
+    authRequired,
+    requireRole(['trainer']),
+    getAllTrainers);
 
 router.get(
   '/member-workouts/:memberId',

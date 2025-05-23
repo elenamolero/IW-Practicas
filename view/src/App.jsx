@@ -19,6 +19,7 @@ import RegisterTrainerPage from "./Pages/RegisterTrainerPage";
 import EditWorkoutPage from "./Pages/EditWorkoutPage";
 import TrainerRoutinesPage from "./Pages/TrainerRoutinesPage";
 import EditUserPage from "./Pages/EditUserPage";
+import CreateGroupClassPage from "./Pages/CreateGrupalClassPage"; 
 
 
 
@@ -46,6 +47,7 @@ function App() {
             <Route path="/register-trainer" element={<RegisterTrainerPage />} />
             <Route path="/trainer-routines" element={<TrainerRoutinesPage />} />
             <Route path="/edit-user" element={<EditUserPage />} />
+            <Route path="/create-group-class" element={<CreateGroupClassPage />} />
           </Routes>
         </GroupClassProvider>
       </WorkoutProvider>
