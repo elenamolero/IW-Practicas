@@ -9,7 +9,7 @@ function InputField({ label, name, type, placeholder, icon, value, onChange }) {
           name={name}       
           type={type}
           placeholder={placeholder}
-          value={value}           
+          value={value ?? ""}           
           onChange={onChange}      
           className="w-full pl-4 pr-10 py-3 rounded-full bg-white text-black focus:outline-none"
         />

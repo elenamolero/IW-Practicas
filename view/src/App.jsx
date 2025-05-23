@@ -16,6 +16,7 @@ import UserManagementPage from "./Pages/UserManagementPage";
 import MuscleRoomPage from "./Pages/MuscleRoomPage";
 import CreateWorkoutPage from "./Pages/CreateWorkoutPage";
 import RegisterTrainerPage from "./Pages/RegisterTrainerPage";
+import EditWorkoutPage from "./Pages/EditWorkoutPage";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<ProfilePage />} />
             </Route>
+            <Route path="/edit-workout/:workoutId" element={<EditWorkoutPage />} />
             <Route path="/profile-settings" element={<ProfilePageSettings />} />
             <Route path="/my-workouts-by-day/:date" element={<WorkoutPage />} />
             <Route path="/create-workout" element={<CreateWorkoutPage />} />

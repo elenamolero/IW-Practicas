@@ -51,7 +51,7 @@ function CreateWorkoutPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ title: titleTrim, description: "Tipo creado desde CreateWorkoutPage" })
+      body: JSON.stringify({ title: titleTrim, description: formData.description })
     });
     const data = await res.json();
     if (res.ok && data.workoutType && data.workoutType._id) {
