@@ -1,66 +1,92 @@
 import {Router} from 'express';
-import {login,register,logout,profile,verifyToken, updateUser, getUserByEmail, deleteUser, getAllMembers, getMemberWorkoutsByDate, getAllTrainers} from "../controllers/auth.controller.js";
+import {
+  login,
+  register,
+  logout,
+  profile,
+  verifyToken,
+  updateUser,
+  getUserByEmail,
+  deleteUser,
+  getAllMembers,
+  getMemberWorkoutsByDate,
+  getAllTrainers
+} from "../controllers/auth.controller.js";
 import { authRequired } from '../Middlewares/validateToken.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
 import { requireRole } from '../Middlewares/requireRole.middleware.js';
 import upload from '../Middlewares/upload.middleware.js';
-import { registerSchema,loginSchema, updateSchema, getUserByEmailSchema, deleteUserSchema } from '../Schemas/auth.schema.js';
+import {
+  registerSchema,
+  loginSchema,
+  updateSchema,
+  getUserByEmailSchema,
+  deleteUserSchema
+} from '../Schemas/auth.schema.js';
 
-const router =Router();
-
+const router = Router();
 
 router.post(
-    '/register',
-    upload.single('photo'),
-    validateSchema(registerSchema),
-    register);
+  '/register',
+  upload.single('photo'),
+  validateSchema(registerSchema),
+  register
+);
+
+router.post(
+  '/login',
+  validateSchema(loginSchema),
+  login
+);
+
+router.post('/logout', logout);
+
+router.get('/profile', verifyToken);
+router.get('/verify', authRequired, profile);
+
 router.put(
-    '/update',
-    authRequired,
-    requireRole(['trainer', 'member']), 
-    validateSchema(updateSchema),
-    updateUser);
+  '/update',
+  authRequired,
+  requireRole(['trainer', 'member']),
+  validateSchema(updateSchema),
+  updateUser
+);
+
 router.get(
-    '/get-user-by-email/:email', 
-    authRequired,
-    requireRole(['trainer', 'member']), 
-    validateSchema(getUserByEmailSchema, 'params'), 
-    getUserByEmail);
+  '/get-user-by-email/:email',
+  authRequired,
+  requireRole(['trainer']),
+  validateSchema(getUserByEmailSchema, 'params'),
+  getUserByEmail
+);
+
 router.delete(
-    '/delete-user/:email',
-    authRequired,
-    requireRole(['trainer', 'member']), // el member puede cancelar la suscripción y el trainer puede eliminar a los demás usuarios
-    validateSchema(deleteUserSchema, 'params'),
-    deleteUser
-  );
-router.post(
-    '/login',
-    validateSchema(loginSchema),
-    login);
+  '/delete-user/:email',
+  authRequired,
+  requireRole(['trainer']),
+  validateSchema(deleteUserSchema, 'params'),
+  deleteUser
+);
 
 router.get(
-    '/members',
-    authRequired,
-    requireRole(['trainer']),
-    getAllMembers);
+  '/members',
+  authRequired,
+  requireRole(['trainer']),
+  getAllMembers
+);
 
 router.get(
-    '/trainers',
-    authRequired,
-    requireRole(['trainer']),
-    getAllTrainers);
+  '/trainers',
+  authRequired,
+  requireRole(['trainer']),
+  getAllTrainers
+);
 
 router.get(
   '/member-workouts/:memberId',
   authRequired,
   requireRole(['trainer']),
-  getMemberWorkoutsByDate);
+  getMemberWorkoutsByDate
+);
 
-router.post('/logout',logout);
-router.get('/profile',verifyToken);
-router.get('/verify',authRequired,profile);
-
-
-
-//agregar a express 
-export default router
+export default router;

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./Pages/HomePage";
 import LoginPage from "./Pages/LoginPage";
@@ -21,9 +22,24 @@ import TrainerRoutinesPage from "./Pages/TrainerRoutinesPage";
 import EditUserPage from "./Pages/EditUserPage";
 import CreateGroupClassPage from "./Pages/CreateGrupalClassPage"; 
 
-
-
 function App() {
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/api/verify", {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Sesión caducada");
+      } catch (err) {
+        alert("Has estado inactivo demasiado tiempo. Por favor inicia sesión de nuevo.");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      }
+    };
+    const interval = setInterval(checkSession, 30000); 
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <AuthProvider>
       <WorkoutProvider>
@@ -33,7 +49,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
             </Route>
             <Route path="/edit-workout/:workoutId" element={<EditWorkoutPage />} />
             <Route path="/profile-settings" element={<ProfilePageSettings />} />
