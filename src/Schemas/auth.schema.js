@@ -75,6 +75,7 @@ export const registerSchema = z.object({
 
   // Solo para traineres
   classesCanTeach: z.array(z.string()).optional()
+  
 }).superRefine((data, ctx) => {
   if (data.role === 'member') {
     if (!data.bankAccount) {
