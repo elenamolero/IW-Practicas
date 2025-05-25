@@ -4,15 +4,25 @@ import InputField from "../Components/InputField";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 
-
 function LoginPage() {
     const [formData, setFormData] = useState({
         email: "",
         password: ""
     });
-    const { signin, isAuthenticated, errors } = useAuth(); 
+    const { signin, isAuthenticated, errors, logout } = useAuth(); 
     const navigate = useNavigate();
 
+    useEffect(() => {
+        // Al entrar en la página de login, forzar logout para limpiar sesión previa
+        if (logout) logout();
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/profile");
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -24,78 +34,67 @@ function LoginPage() {
         await signin(formData);
     };
 
-    useEffect(() => {
-        if (isAuthenticated) {
-          navigate("/profile");
-        }
-      }, [isAuthenticated, navigate]);
-
-
-
-return (
-    <div className="relative min-h-screen flex items-center justify-center bg-black text-white">
-        {/* Fondo */}
-        <div className="absolute inset-0">
-            <img
-                src="/Fondo.jpg"
-                alt="Fondo de pesas"
-                className="w-full h-full object-cover opacity-40"
-            />
-        </div>
-
-        {/* Contenido */}
-        <div className="z-10 w-full max-w-md px-8 mt-20">
-            <h1 className="text-4xl md:text-5xl font-bold text-center mb-10">
-                ¡Bienvenido de nuevo!
-            </h1>
-
-            <form onSubmit={handleSubmit} className="bg-gray-800 bg-opacity-60 p-6 rounded-2xl space-y-6">
-                {/* Notificación de error */}
-                {errors && errors.length > 0 && (
-                    <div className="bg-red-500 text-white rounded-lg px-4 py-2 mb-2 text-center font-semibold">
-                        Usuario o contraseña incorrectos
-                    </div>
-                )}
-
-                <InputField 
-                    label="Correo" 
-                    name="email" 
-                    type="email" 
-                    placeholder="email@example.com" 
-                    icon={<FaEnvelope />} 
-                    value={formData.email} 
-                    onChange={handleChange} 
+    return (
+        <div className="relative min-h-screen flex items-center justify-center bg-black text-white">
+            {/* Fondo */}
+            <div className="absolute inset-0">
+                <img
+                    src="/Fondo.jpg"
+                    alt="Fondo de pesas"
+                    className="w-full h-full object-cover opacity-40"
                 />
-                <InputField 
-                    label="Contraseña" 
-                    name="password" 
-                    type="password" 
-                    placeholder="********" 
-                    icon={<FaLock />} 
-                    value={formData.password} 
-                    onChange={handleChange} 
-                />
+            </div>
 
-                <button
-                    type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300"
-                >
-                    Iniciar sesión
-                </button>
+            {/* Contenido */}
+            <div className="z-10 w-full max-w-md px-8 mt-20">
+                <h1 className="text-4xl md:text-5xl font-bold text-center mb-10">
+                    ¡Bienvenido de nuevo!
+                </h1>
 
-                <p className="text-center text-gray-300">
-                    ¿No tienes una cuenta?{" "}
-                    <Link to="/register" className="text-blue-400 hover:text-blue-300">
-                        Regístrate aquí
-                    </Link>
-                </p>
-            </form>
+                <form onSubmit={handleSubmit} className="bg-gray-800 bg-opacity-60 p-6 rounded-2xl space-y-6">
+                    {/* Notificación de error */}
+                    {errors && errors.length > 0 && (
+                        <div className="bg-red-500 text-white rounded-lg px-4 py-2 mb-2 text-center font-semibold">
+                            Usuario o contraseña incorrectos
+                        </div>
+                    )}
+
+                    <InputField 
+                        label="Correo" 
+                        name="email" 
+                        type="email" 
+                        placeholder="email@example.com" 
+                        icon={<FaEnvelope />} 
+                        value={formData.email} 
+                        onChange={handleChange} 
+                    />
+                    <InputField 
+                        label="Contraseña" 
+                        name="password" 
+                        type="password" 
+                        placeholder="********" 
+                        icon={<FaLock />} 
+                        value={formData.password} 
+                        onChange={handleChange} 
+                    />
+
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300"
+                    >
+                        Iniciar sesión
+                    </button>
+
+                    <p className="text-center text-gray-300">
+                        ¿No tienes una cuenta?{" "}
+                        <Link to="/register" className="text-blue-400 hover:text-blue-300">
+                            Regístrate aquí
+                        </Link>
+                    </p>
+                </form>
+            </div>
         </div>
-    </div>
-);
-
-
+    );
 }
 
 export default LoginPage;
-  
