@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaUserPlus } from "react-icons/fa";
 import Navbar from "../Components/Navbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -51,13 +51,33 @@ function UserManagementPage() {
         </div>
 
         {/* Lista de usuarios */}
-        <ul>
+        <ul className="space-y-2">
           {filteredUsers.map((user) => (
-            <li key={user._id} className="py-2 border-b">
-              {user.email}
+            <li
+              key={user._id}
+              className="flex justify-between items-center bg-gray-100 px-6 py-3 rounded"
+            >
+              <span className="text-lg text-gray-800">{user.email}</span>
+              <button
+                onClick={() => navigate(`/edit-user-member/${user._id}`)}
+                className="text-blue-600 font-medium hover:underline"
+              >
+                Editar Perfil
+              </button>
             </li>
           ))}
         </ul>
+
+        {/* Botón nuevo entrenador */}
+        <div className="flex justify-end mt-10">
+          <button
+            onClick={() => navigate("/register-trainer")}
+            className="flex items-center gap-2 bg-blue-300 hover:bg-blue-400 text-white px-6 py-3 rounded-full text-lg font-semibold shadow"
+          >
+            <FaUserPlus />
+            Nuevo Entrenador
+          </button>
+        </div>
       </main>
     </div>
   );

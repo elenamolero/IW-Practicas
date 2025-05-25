@@ -4,6 +4,67 @@ import { createAccessToken } from "../libs/jwt.js";
 import jwt from "jsonwebtoken";
 import { TOKEN_SECRET } from "../config.js";
 
+export const getMemberById = async (req, res) => {
+  try {
+    console.log("Buscando miembro con id:", req.params.id);
+    const member = await User.findById(req.params.id);
+    if (!member || member.role !== "member") {
+      return res.status(404).json({ message: "Miembro no encontrado" });
+    }
+    console.log("Datos del miembro encontrados:", member);
+    res.json({
+      _id: member._id,
+      email: member.email,
+      firstName: member.firstName,
+      lastName: member.lastName,
+      phone: member.phone,
+      bankAccount: member.bankAccount,
+      weight: member.weight,
+      height: member.height,
+      role: member.role,
+    });
+  } catch (error) {
+    console.error("Error en getMemberById:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateUserMember = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    // Solo permite actualizar miembros
+    const user = await User.findById(id);
+    if (!user || user.role !== 'member') {
+      return res.status(404).json({ message: "Miembro no encontrado" });
+    }
+
+    // Actualiza los campos permitidos
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    res.json({
+      id: updatedUser._id,
+      email: updatedUser.email,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
+      phone: updatedUser.phone,
+      photo: updatedUser.photo,
+      bankAccount: updatedUser.bankAccount,
+      weight: updatedUser.weight,
+      height: updatedUser.height,
+      role: updatedUser.role,
+      updatedAt: updatedUser.updatedAt,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // delete user
 export const deleteUser = async (req, res) => {
   try {

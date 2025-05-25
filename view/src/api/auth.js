@@ -11,6 +11,18 @@ export const verifyTokenRequet = () => {
     });
 };
 
+export const getMemberByIdRequest = (id) => {
+  return axios.get(`http://localhost:4000/api/member/${id}`, {
+    withCredentials: true,
+  });
+}
+
+export const updateUserMemberRequest = (user) => {
+  return axios.put("http://localhost:4000/api/update", user, {
+    withCredentials: true,
+  });
+}
+
 export const registerTrainer = async (formData) => {
   const res = await axios.post(
     "http://localhost:3000/api/register-trainer",

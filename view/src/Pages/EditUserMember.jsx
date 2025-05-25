@@ -2,18 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import InputField from "../Components/InputField";
-import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
-import { useAuth } from "../Context/AuthContext";
+import { FaUser, FaLock, FaEnvelope, FaCheckCircle } from "react-icons/fa";
+import { getMemberByIdRequest, updateUserMemberRequest } from "../api/auth";
 
 const EditUserMemberPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const {
-    fetchMemberById,
-    updateMember,
-    memberError,
-  } = useAuth();
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -24,27 +18,33 @@ const EditUserMemberPage = () => {
     height: "",
   });
   const [userRole, setUserRole] = useState("member");
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    fetchMemberById(id)
-      .then((data) => {
+    const fetchMember = async () => {
+      try {
+        console.log("Solicitando datos de miembro con id:", id);
+        const res = await getMemberByIdRequest(id);
+        console.log("Respuesta del backend:", res.data);
         setFormData({
-          firstName: data.firstName || "",
-          lastName: data.lastName || "",
-          email: data.email || "",
-          phone: data.phone || "",
-          bankAccount: data.bankAccount || "",
-          weight: data.weight || "",
-          height: data.height || "",
+          firstName: res.data.firstName || "",
+          lastName: res.data.lastName || "",
+          email: res.data.email || "",
+          phone: res.data.phone || "",
+          bankAccount: res.data.bankAccount || "",
+          weight: res.data.weight || "",
+          height: res.data.height || "",
         });
-        setUserRole(data.role || "member");
-      })
-      .catch(() => {
-        alert("No se pudo cargar el usuario");
+        setUserRole(res.data.role || "member");
+      } catch (err) {
+        setError("No se pudo cargar el usuario");
+        setTimeout(() => setError(null), 4000);
         navigate("/user-manager");
-      });
-    // eslint-disable-next-line
-  }, [id]);
+      }
+    };
+    fetchMember();
+  }, [id, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,6 +53,8 @@ const EditUserMemberPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(false);
 
     const updatedPayload = {
       ...formData,
@@ -61,19 +63,22 @@ const EditUserMemberPage = () => {
       role: userRole,
       _id: id,
     };
-
+    console.log("Enviando payload para actualizar:", updatedPayload);
     try {
-      await updateMember(updatedPayload);
-      alert("Datos actualizados correctamente");
-      navigate("/user-manager");
+      await updateUserMemberRequest(updatedPayload);
+      setSuccess(true);
+      setTimeout(() => {
+        navigate("/user-manager");
+      }, 2000); // 2 segundos de notificación antes de redirigir
     } catch (err) {
-      alert(
-        memberError ||
-        (err.response?.data?.message ||
-          (Array.isArray(err.response?.data)
-            ? err.response.data.join(", ")
-            : "Error al actualizar el usuario"))
-      );
+      if (Array.isArray(err.response?.data)) {
+        setError(err.response.data.join(", "));
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Error al actualizar el usuario");
+      }
+      setTimeout(() => setError(null), 4000);
     }
   };
 
@@ -82,6 +87,18 @@ const EditUserMemberPage = () => {
       <Navbar />
       <main className="max-w-xl mx-auto p-6">
         <h1 className="text-4xl font-bold text-center mb-10">MODIFICAR USUARIO</h1>
+        {/* Notificación bonita de éxito */}
+        {success && (
+          <div className="bg-green-500 text-white rounded-lg px-4 py-2 mb-2 text-center font-semibold flex items-center justify-center gap-2">
+            <FaCheckCircle className="text-xl" /> ¡Usuario actualizado correctamente! Redirigiendo...
+          </div>
+        )}
+        {/* Notificación bonita de errores */}
+        {error && (
+          <div className="bg-red-500 text-white rounded-lg px-4 py-2 mb-4 text-center font-semibold">
+            {error}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="bg-blue-100 rounded-3xl p-6 space-y-6">
           <InputField
             label="*Nombre"
