@@ -45,24 +45,41 @@ const WorkoutPage = () => {
     });
   };
 
-  const handleDelete = async (workoutId) => {
-    if (!window.confirm("¿Estás seguro de que quieres eliminar este workout?")) return;
+  const handleDelete = async (workoutId, workoutTypeId) => {
+    if (!window.confirm("¿Seguro que quieres eliminar este workout y su tipo de ejercicio?")) return;
   
     try {
-      const res = await fetch(`http://localhost:4000/api/workouts/${workoutId}`, {
-        method: "DELETE",
-        credentials: "include"
-      });
+      // 1. Eliminar el workout
+      const resWorkout = await fetch(
+        `http://localhost:4000/api/workouts/${workoutId}${userId ? `?userId=${userId}` : ""}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
   
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+      const dataWorkout = await resWorkout.json();
+      if (!resWorkout.ok) throw new Error(dataWorkout.message);
   
-      alert("Workout eliminado correctamente");
-      fetchWorkoutsByWeek(selectedDate); // Refresca la lista
+      // 2. Eliminar el workoutType
+      const resType = await fetch(
+        `http://localhost:4000/api/workout-types/${workoutTypeId}${userId ? `?userId=${userId}` : ""}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+  
+      const dataType = await resType.json();
+      if (!resType.ok) throw new Error(dataType.message);
+  
+      alert("Workout y tipo de ejercicio eliminados correctamente");
+      fetchWorkoutsByWeek(selectedDate, userId); // Recargar lista
     } catch (err) {
-      alert("Error al eliminar el workout: " + err.message);
+      alert("Error al eliminar: " + err.message);
     }
   };
+  
 
   const selectedWorkouts = weeklyWorkouts.find((day) => day.date === selectedDate);
 
@@ -128,13 +145,15 @@ const WorkoutPage = () => {
                       <div className="flex justify-end gap-4 mt-2">
                         <button
                           className="text-blue-500 hover:underline"
-                          onClick={() => navigate(`/edit-workout/${workout._id}`)}
+                          onClick={() => navigate(`/edit-workout/${workout._id}`, {
+                            state: { userId }
+                          })}                          
                         >
                         Modificar
                         </button>
                         <button
                           className="text-red-500 hover:underline"
-                          onClick={() => handleDelete(workout._id)}
+                          onClick={() => handleDelete(workout._id, workout.workoutType_id._id)}
                         >
                         Eliminar
                         </button>

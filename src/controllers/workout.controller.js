@@ -179,39 +179,49 @@ export const getUserWorkouts = async (req, res) => {
 export const getWorkoutById = async (req, res) => {
   try {
     const { workoutId } = req.params;
-    const userId = req.user.id;
-    
-     // Verificar si el workout existe y pertenece al usuario
-     const workout = await Workout.findOne({ 
-      _id: workoutId,
-      user_id: userId
-    }).populate('workoutType_id', 'title description');
+    const requesterRole = req.user.role;
+
+    let workout;
+
+    if (requesterRole === 'trainer') {
+      // El entrenador puede ver cualquier workout
+      workout = await Workout.findById(workoutId).populate('workoutType_id', 'title description');
+    } else {
+      // El miembro solo puede ver sus propios workouts
+      workout = await Workout.findOne({
+        _id: workoutId,
+        user_id: req.user.id,
+      }).populate('workoutType_id', 'title description');
+    }
 
     if (!workout) {
       return res.status(404).json({
-        message: "Workout no encontrado o no tienes permiso para verlo."
+        message: "Workout no encontrado o no tienes permiso para verlo.",
       });
     }
-    
+
     res.json({
       message: "Workout obtenido exitosamente.",
-      workout
+      workout,
     });
-    
+
   } catch (error) {
     console.error("Error al obtener el workout: ", error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Error al obtener el workout",
-      error: error.message 
+      error: error.message,
     });
   }
 };
+
 
 // Actualizar un workout
 export const updateWorkout = async (req, res) => {
   try {
     const { workoutId } = req.params;
-    const userId = req.user.id;
+    const role = req.user.role;
+    const userId = role === 'trainer' ? req.query.userId : req.user.id;
+
     const {
       workoutTypeId,
       date,
@@ -222,45 +232,45 @@ export const updateWorkout = async (req, res) => {
       intensity,
       weight
     } = req.body;
-    
+
     // Verificar si el workout existe y pertenece al usuario
     const workout = await Workout.findOne({ 
       _id: workoutId,
       user_id: userId
     });
-    
+
     if (!workout) {
       return res.status(404).json({
         message: "Workout no encontrado o no tienes permiso para actualizarlo."
       });
     }
-    
-    // Si se está actualizando el tipo de workout, verificar que exista y pertenezca al usuario
+
+    // Verificar si el tipo de workout es válido y pertenece al usuario
     if (workoutTypeId && workoutTypeId !== workout.workoutType_id.toString()) {
       const workoutType = await WorkoutType.findById(workoutTypeId);
       if (!workoutType) {
         return res.status(404).json({ message: "Tipo de workout no encontrado." });
       }
-      
+
       if (workoutType.user_id.toString() !== userId) {
         return res.status(403).json({ 
           message: "No tienes permiso para usar este tipo de workout." 
         });
       }
     }
-    
-    // Si se está actualizando la fecha, validar el formato
+
+    // Validar fecha
     let workoutDate = workout.date;
     if (date) {
       workoutDate = new Date(date);
       if (isNaN(workoutDate.getTime())) {
         return res.status(400).json({
-          message: "La fecha del workout no es válida. Formato esperado: YYYY-MM-DDTHH:mm:ss."
+          message: "La fecha del workout no es válida. Formato esperado: YYYY-MM-DD."
         });
       }
     }
-    
-    // Si se está actualizando la intensidad, validar el rango
+
+    // Validar intensidad
     if (intensity) {
       const intensityScale = { min: 1, max: 10 };
       if (intensity < intensityScale.min || intensity > intensityScale.max) {
@@ -269,8 +279,8 @@ export const updateWorkout = async (req, res) => {
         });
       }
     }
-    
-    // Si se está actualizando la fecha o el orden, verificar que no haya conflictos
+
+    // Validar conflicto de fecha y orden
     if ((date || order) && (date !== workout.date || order !== workout.order)) {
       const existingWorkout = await Workout.findOne({ 
         date: workoutDate, 
@@ -278,14 +288,14 @@ export const updateWorkout = async (req, res) => {
         user_id: userId,
         _id: { $ne: workoutId }
       });
-      
+
       if (existingWorkout) {
         return res.status(400).json({
           message: "Ya existe un workout con la misma fecha y orden para este usuario."
         });
       }
     }
-    
+
     // Actualizar el workout
     workout.workoutType_id = workoutTypeId || workout.workoutType_id;
     workout.date = workoutDate;
@@ -295,14 +305,14 @@ export const updateWorkout = async (req, res) => {
     workout.order = order || workout.order;
     workout.intensity = intensity || workout.intensity;
     workout.weight = weight || workout.weight;
-    
+
     await workout.save();
-    
+
     res.json({
       message: "Workout actualizado exitosamente.",
       workout
     });
-    
+
   } catch (error) {
     console.error("Error al actualizar el workout: ", error);
     res.status(500).json({ 
@@ -312,36 +322,36 @@ export const updateWorkout = async (req, res) => {
   }
 };
 
+
 // Eliminar un workout
 export const deleteWorkout = async (req, res) => {
   try {
     const { workoutId } = req.params;
-    const userId = req.user.id;
-    
-    // Verificar si el workout existe y pertenece al usuario
-    const workout = await Workout.findOne({ 
+    const role = req.user.role;
+    const userId = role === "trainer" ? req.query.userId : req.user.id;
+
+    const workout = await Workout.findOne({
       _id: workoutId,
       user_id: userId
     });
-    
+
     if (!workout) {
       return res.status(404).json({
         message: "Workout no encontrado o no tienes permiso para eliminarlo."
       });
     }
-    
-    // Eliminar el workout
+
     await Workout.findByIdAndDelete(workoutId);
-    
+
     res.json({
       message: "Workout eliminado exitosamente."
     });
-    
+
   } catch (error) {
     console.error("Error al eliminar el workout: ", error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Error al eliminar el workout",
-      error: error.message 
+      error: error.message
     });
   }
 };

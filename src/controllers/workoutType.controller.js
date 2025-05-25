@@ -90,71 +90,75 @@ export const getAllWorkoutTypes = async (req, res) => {
 export const getWorkoutTypeById = async (req, res) => {
   try {
     const { workoutTypeId } = req.params;
-    const userId = req.user.id;
+    const requesterRole = req.user.role;
+    const memberUserId = req.query.userId;
 
-    const workoutType = await WorkoutType.findOne({
+    let workoutType;
+
+    if (requesterRole === 'trainer') {
+      // El entrenador accede al workoutType del socio
+      workoutType = await WorkoutType.findOne({
         _id: workoutTypeId,
-        user_id: userId
+        user_id: memberUserId, // <-- usamos el ID pasado
       });
-  
-      if (!workoutType) {
-        return res.status(404).json({
-          message: "Tipo de entrenamiento no encontrado"
-        });
-      }
-  
-      res.json(workoutType);
+    } else {
+      // El socio accede solo a los suyos
+      workoutType = await WorkoutType.findOne({
+        _id: workoutTypeId,
+        user_id: req.user.id,
+      });
+    }
+
+    if (!workoutType) {
+      return res.status(404).json({ message: "Tipo de entrenamiento no encontrado" });
+    }
+
+    res.json(workoutType);
   } catch (error) {
     res.status(500).json({
       message: "Error al obtener el tipo de entrenamiento",
-      error: error.message
+      error: error.message,
     });
   }
 };
+
+
 
 // Actualizar un tipo de workout
 export const updateWorkoutType = async (req, res) => {
   try {
     const { workoutTypeId } = req.params;
     const { title, description } = req.body;
-    const userId = req.user.id;
+    const role = req.user.role;
+    const userIdParam = req.query.userId;
 
-    // Verificar si existe el tipo de workout
-    const workoutType = await WorkoutType.findOne({
+    let workoutType;
+
+    if (role === 'trainer') {
+      workoutType = await WorkoutType.findOne({
         _id: workoutTypeId,
-        user_id: userId
+        user_id: userIdParam
       });
-  
-      if (!workoutType) {
-        return res.status(404).json({
-          message: "Tipo de entrenamiento no encontrado"
-        });
-      }
-  
-      // Comprobar si hay otro título igual
-      if (title && title !== workoutType.title) {
-        const existingWorkoutType = await WorkoutType.findOne({
-          title,
-          user_id: userId
-        });
-  
-        if (existingWorkoutType) {
-          return res.status(400).json({
-            message: "Ya existe un tipo de entrenamiento con este título"
-          });
-        }
-      }
-  
-      // Actualizar
-      workoutType.title = title || workoutType.title;
-      workoutType.description = description || workoutType.description;
-      await workoutType.save();
-  
-      res.json({
-        message: "Tipo de entrenamiento actualizado exitosamente",
-        workoutType
+    } else {
+      workoutType = await WorkoutType.findOne({
+        _id: workoutTypeId,
+        user_id: req.user.id
       });
+    }
+
+    if (!workoutType) {
+      return res.status(404).json({
+        message: "No tienes permiso para modificar este tipo de entrenamiento o no existe"
+      });
+    }
+
+    workoutType.title = title;
+    workoutType.description = description;
+    await workoutType.save();
+
+    res.json({ message: "Tipo de entrenamiento actualizado correctamente" });
   } catch (error) {
+    console.error("Error al actualizar el tipo de workout:", error);
     res.status(500).json({
       message: "Error al actualizar el tipo de entrenamiento",
       error: error.message
@@ -162,30 +166,33 @@ export const updateWorkoutType = async (req, res) => {
   }
 };
 
+
 // Eliminar un tipo de workout
 export const deleteWorkoutType = async (req, res) => {
   try {
     const { workoutTypeId } = req.params;
-    const userId = req.user.id;
+    const role = req.user.role;
+    const userId = role === "trainer" ? req.query.userId : req.user.id;
 
     const workoutType = await WorkoutType.findOneAndDelete({
-        _id: workoutTypeId,
-        user_id: userId
+      _id: workoutTypeId,
+      user_id: userId
+    });
+
+    if (!workoutType) {
+      return res.status(404).json({
+        message: "Tipo de entrenamiento no encontrado o no tienes permiso para eliminarlo"
       });
-  
-      if (!workoutType) {
-        return res.status(404).json({
-          message: "Tipo de entrenamiento no encontrado"
-        });
-      }
-  
-      res.json({
-        message: "Tipo de entrenamiento eliminado exitosamente"
-      });
+    }
+
+    res.json({
+      message: "Tipo de entrenamiento eliminado exitosamente"
+    });
   } catch (error) {
+    console.error("Error al eliminar el tipo de entrenamiento:", error);
     res.status(500).json({
       message: "Error al eliminar el tipo de entrenamiento",
       error: error.message
     });
   }
-}; 
+};

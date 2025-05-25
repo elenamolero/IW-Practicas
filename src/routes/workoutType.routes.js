@@ -26,23 +26,16 @@ router.post(
 router.get(
   '/my-workout-types',
   authRequired,
-  requireRole(['member']),
+  requireRole(['member', 'trainer']),
   getUserWorkoutTypes
 );
 
-// Obtener un tipo de workout específico
-router.get(
-  '/workout-types/:workoutTypeId',
-  authRequired,
-  requireRole(['member']),
-  getWorkoutTypeById
-);
 
 // Actualizar un tipo de workout
 router.put(
   '/workout-types/:workoutTypeId',
   authRequired,
-  requireRole(['member']),
+  requireRole(['member', 'trainer']),
   validateSchema(updateWorkoutTypeSchema),
   updateWorkoutType
 );
@@ -51,8 +44,16 @@ router.put(
 router.delete(
   '/workout-types/:workoutTypeId',
   authRequired,
-  requireRole(['member']),
+  requireRole(['member', 'trainer']),
   deleteWorkoutType
+);
+
+// Obtener un tipo de workout por ID
+router.get(
+  '/workout-types/:workoutTypeId',
+  authRequired,
+  requireRole(['member', 'trainer']), 
+  getWorkoutTypeById
 );
 
 export default router; 

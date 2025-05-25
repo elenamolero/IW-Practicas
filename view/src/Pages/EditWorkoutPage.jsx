@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../Components/Navbar";
 import InputField from "../Components/InputField";
@@ -8,6 +8,8 @@ import { FaDumbbell, FaInfoCircle } from "react-icons/fa";
 const EditWorkoutPage = () => {
   const { workoutId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const memberUserId = location.state?.userId;
   const [formData, setFormData] = useState({
     order: "",
     workoutTypeId: "",
@@ -31,7 +33,8 @@ const EditWorkoutPage = () => {
         setFormData({
           order: workout.order,
           workoutTypeId: workout.workoutType_id._id,
-          description: workout.workoutType_id.description,
+          workoutTypeTitle: workout.workoutType_id.title,
+          workoutTypeDescription: workout.workoutType_id.description,
           intensity: workout.intensity,
           series: workout.series,
           repetitions: workout.repetitions,
@@ -50,9 +53,10 @@ const EditWorkoutPage = () => {
     const fetchWorkoutType = async () => {
       if (!formData.workoutTypeId) return;
       try {
-        const res = await axios.get(`http://localhost:4000/api/workout-types/${formData.workoutTypeId}`, {
-          withCredentials: true,
-        });
+        const res = await axios.get(
+          `http://localhost:4000/api/workout-types/${formData.workoutTypeId}?userId=${memberUserId}`,
+          { withCredentials: true }
+        );
         const workoutType = res.data;
         setFormData((prev) => ({
           ...prev,
@@ -86,23 +90,31 @@ const EditWorkoutPage = () => {
         rest: Number(formData.rest),
         order: Number(formData.order),
       };
-      console.log("Datos que se van a enviar para actualizar:", updatedData);
+
 
       await axios.put(
-        `http://localhost:4000/api/workout-types/${formData.workoutTypeId}`,
+        `http://localhost:4000/api/workout-types/${formData.workoutTypeId}?userId=${memberUserId}`,
         {
           title: formData.workoutTypeTitle,
           description: formData.workoutTypeDescription,
         },
         { withCredentials: true }
       );
+      console.log("Tipo de workout actualizado correctamente");
+      
 
-      await axios.put(`http://localhost:4000/api/workouts/${workoutId}`, updatedData, {
-        withCredentials: true,
-      });
+      await axios.put(
+        `http://localhost:4000/api/workouts/${workoutId}?userId=${memberUserId}`,
+        updatedData,
+        { withCredentials: true }
+      );
+      
 
       alert("Workout actualizado correctamente");
-      navigate("/my-workouts-by-day/" + formData.date);
+      navigate("/my-workouts-by-day/" + formData.date, {
+        state: memberUserId ? { userId: memberUserId } : undefined
+      });
+      
     } catch (err) {
         console.error("Error al actualizar el workout:", err.response?.data || err.message);
       alert(err.response?.data?.message || "Error al actualizar el workout");
@@ -115,7 +127,7 @@ const EditWorkoutPage = () => {
       <main className="max-w-xl mx-auto p-6">
         <h1 className="text-4xl font-bold text-center mb-10">MODIFICAR EJERCICIO</h1>
         <form onSubmit={handleSubmit} className="bg-blue-100 rounded-3xl p-6 space-y-6">
-          <InputField label="Orden" name="order" type="number" value={formData.order} onChange={handleChange} required />
+          <InputField label="Orden" name="order" type="number" value={formData.order} onChange={handleChange} required labelClassName="text-black font-semibold" />
           <InputField
             label="Nombre"
             name="workoutTypeTitle"
@@ -124,6 +136,7 @@ const EditWorkoutPage = () => {
             onChange={handleChange}
             icon={<FaDumbbell />}
             required
+            labelClassName="text-black font-semibold"
             />
 
             <div className="space-y-1">
@@ -141,12 +154,12 @@ const EditWorkoutPage = () => {
             </div>
                 <p className="text-right text-sm font-medium">máx. 200 caractéres</p>
             </div>
-          <InputField label="Intensidad" name="intensity" type="number" value={formData.intensity} onChange={handleChange} required />
-          <InputField label="Series" name="series" type="number" value={formData.series} onChange={handleChange} required />
-          <InputField label="Repeticiones" name="repetitions" type="number" value={formData.repetitions} onChange={handleChange} required />
-          <InputField label="Peso (kg)" name="weight" type="number" value={formData.weight} onChange={handleChange} required />
-          <InputField label="Descanso (seg)" name="rest" type="number" value={formData.rest} onChange={handleChange} required />
-          <InputField label="Fecha" name="date" type="date" value={formData.date} onChange={handleChange} required />
+          <InputField label="Intensidad" name="intensity" type="number" value={formData.intensity} onChange={handleChange} required labelClassName="text-black font-semibold" />
+          <InputField label="Series" name="series" type="number" value={formData.series} onChange={handleChange} required labelClassName="text-black font-semibold" />
+          <InputField label="Repeticiones" name="repetitions" type="number" value={formData.repetitions} onChange={handleChange} required labelClassName="text-black font-semibold" />
+          <InputField label="Peso (kg)" name="weight" type="number" value={formData.weight} onChange={handleChange} required labelClassName="text-black font-semibold" />
+          <InputField label="Descanso (seg)" name="rest" type="number" value={formData.rest} onChange={handleChange} required labelClassName="text-black font-semibold" />
+          <InputField label="Fecha" name="date" type="date" value={formData.date} onChange={handleChange} required labelClassName="text-black font-semibold" />
           <div className="text-center pt-4">
             <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-2 rounded-full">GUARDAR CAMBIOS</button>
           </div>

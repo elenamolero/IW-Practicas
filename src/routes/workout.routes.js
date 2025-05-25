@@ -44,7 +44,7 @@ router.get(
 router.get(
   '/workouts/:workoutId',
   authRequired,
-  requireRole(['member']),
+  requireRole(['member', 'trainer']),
   getWorkoutById
 );
 
@@ -52,7 +52,7 @@ router.get(
 router.put(
   '/workouts/:workoutId',
   authRequired,
-  requireRole(['member']),
+  requireRole(['member', 'trainer']),
   validateSchema(updateWorkoutSchema),
   updateWorkout
 );
@@ -61,8 +61,9 @@ router.put(
 router.delete(
   '/workouts/:workoutId',
   authRequired,
-  requireRole(['member']),
+  requireRole(['member', 'trainer']),
   deleteWorkout
 );
+
 
 export default router;

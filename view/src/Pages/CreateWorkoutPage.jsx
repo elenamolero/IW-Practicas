@@ -148,22 +148,9 @@ function CreateWorkoutPage() {
     <div className="relative min-h-screen flex flex-col items-center bg-white text-gray-900 overflow-x-hidden">
       <Navbar />
 
-      {/* Notificación bonita */}
-      {notification.show && (
-        <div
-          className={`fixed top-8 left-1/2 transform -translate-x-1/2 z-50 px-8 py-4 rounded-xl shadow-lg text-lg font-semibold transition-all duration-300
-            ${notification.type === "success"
-              ? "bg-green-100 text-green-800 border border-green-400"
-              : "bg-red-100 text-red-800 border border-red-400"}
-          `}
-        >
-          {notification.message}
-        </div>
-      )}
-
       <div className="z-10 w-full max-w-2xl px-4 py-16">
         <h1 className="text-4xl md:text-5xl font-semibold tracking-wider text-center mb-14">
-          Crea tu Workout
+          Modificar ejercicio
         </h1>
 
         <form
@@ -175,7 +162,6 @@ function CreateWorkoutPage() {
             label={<span className="font-semibold text-[#072F5D]">Orden</span>}
             name="order"
             type="number"
-            min={0}
             placeholder="Orden del ejercicio"
             value={formData.order}
             onChange={handleChange}
@@ -185,9 +171,9 @@ function CreateWorkoutPage() {
           {/* NOMBRE */}
           <InputField
             label={<span className="font-semibold text-[#072F5D]">Nombre</span>}
-            name="workoutTypeId"
-            placeholder="Título del tipo de ejercicio"
-            value={formData.workoutTypeId}
+            name="workoutTypeTitle"
+            placeholder="Título del ejercicio"
+            value={formData.workoutTypeTitle}
             onChange={handleChange}
             icon={<FaDumbbell className="text-[#072F5D]" />}
             required
@@ -198,8 +184,8 @@ function CreateWorkoutPage() {
             <label className="font-semibold text-[#072F5D]">Descripción</label>
             <div className="relative">
               <textarea
-                name="description"
-                value={formData.description}
+                name="workoutTypeDescription"
+                value={formData.workoutTypeDescription}
                 onChange={handleChange}
                 placeholder="Descripción del ejercicio (máx. 200)"
                 maxLength={200}
@@ -209,7 +195,7 @@ function CreateWorkoutPage() {
               <FaInfoCircle className="absolute right-6 top-1/2 -translate-y-1/2 text-[#072F5D]" />
             </div>
             <p className="text-right text-sm font-medium text-[#072F5D]">
-              {formData.description.length}/200 caracteres
+              {formData.workoutTypeDescription.length}/200 caracteres
             </p>
           </div>
 
@@ -296,13 +282,13 @@ function CreateWorkoutPage() {
               type="submit"
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold text-lg px-12 py-4 rounded-full transition"
             >
-              CREAR ENTRENAMIENTO
+              GUARDAR CAMBIOS
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-}
+};
 
 export default CreateWorkoutPage;
