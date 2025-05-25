@@ -10,7 +10,9 @@ import {
   deleteUser,
   getAllMembers,
   getMemberWorkoutsByDate,
-  getAllTrainers
+  getAllTrainers,
+  updateUserMember,
+  getMemberById
 } from "../controllers/auth.controller.js";
 import { authRequired } from '../Middlewares/validateToken.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
@@ -89,4 +91,18 @@ router.get(
   getMemberWorkoutsByDate
 );
 
+router.put(
+'/update-member/:id',
+authRequired,
+requireRole(['trainer']),
+validateSchema(updateSchema),
+updateUserMember
+);
+
+router.get(
+  '/member/:id',
+  authRequired,
+  requireRole(['trainer']),
+  getMemberById
+);
 export default router;
