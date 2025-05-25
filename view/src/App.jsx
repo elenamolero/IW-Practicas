@@ -36,7 +36,7 @@ function App() {
         window.location.href = "/login";
       }
     };
-    const interval = setInterval(checkSession, 30000); 
+    const interval = setInterval(checkSession, 180000); 
     return () => clearInterval(interval);
   }, []);
 

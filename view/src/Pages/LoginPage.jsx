@@ -4,15 +4,25 @@ import InputField from "../Components/InputField";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 
-
 function LoginPage() {
     const [formData, setFormData] = useState({
         email: "",
         password: ""
     });
-    const { signin, isAuthenticated, errors } = useAuth(); 
+    const { signin, isAuthenticated, errors, logout } = useAuth(); 
     const navigate = useNavigate();
 
+    useEffect(() => {
+        // Al entrar en la página de login, forzar logout para limpiar sesión previa
+        if (logout) logout();
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/profile");
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -23,12 +33,6 @@ function LoginPage() {
         e.preventDefault();
         await signin(formData);
     };
-
-    useEffect(() => {
-        if (isAuthenticated) {
-          navigate("/profile");
-        }
-      }, [isAuthenticated, navigate]);
 
     return (
         <div className="relative min-h-screen flex items-center justify-center bg-black text-white">
@@ -48,6 +52,13 @@ function LoginPage() {
                 </h1>
 
                 <form onSubmit={handleSubmit} className="bg-gray-800 bg-opacity-60 p-6 rounded-2xl space-y-6">
+                    {/* Notificación de error */}
+                    {errors && errors.length > 0 && (
+                        <div className="bg-red-500 text-white rounded-lg px-4 py-2 mb-2 text-center font-semibold">
+                            Usuario o contraseña incorrectos
+                        </div>
+                    )}
+
                     <InputField 
                         label="Correo" 
                         name="email" 
@@ -87,4 +98,3 @@ function LoginPage() {
 }
 
 export default LoginPage;
-  
