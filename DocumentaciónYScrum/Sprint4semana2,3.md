@@ -1,4 +1,4 @@
-# Sprint 4 - Semana 1
+# Sprint 4 - Semana 2,3
 
 ## Metodología Scrum
 
