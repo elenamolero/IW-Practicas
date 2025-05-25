@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { workoutRequest, createWorkoutRequest } from "../api/workout";
+import { workoutRequest, createWorkoutRequest, memberWorkoutsByDateRequest } from "../api/workout";
 
 const WorkoutContext = createContext();
 
@@ -73,7 +73,46 @@ export const WorkoutProvider = ({ children }) => {
     }
   };
 
-  // NUEVO: Crear workout desde el contexto
+  // NUEVO: Para miembros concretos
+const fetchMemberWorkoutsByWeek = async (startDate, memberId) => {
+  try {
+     console.log("fetchMemberWorkoutsByWeek called", startDate, memberId);
+    setLoading(true);
+
+    // Calcular el inicio de la semana (lunes)
+    const inputDate = new Date(startDate);
+    const dayOfWeek = inputDate.getDay();
+    const startOfWeek = new Date(inputDate.setDate(inputDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)));
+
+    // Fechas de lunes a domingo de la semana actual
+    const dates = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      return date.toISOString().split("T")[0];
+    });
+
+    // Solo una petición a la vez por día, y si falla, no relanza el error
+    const workoutsByDay = await Promise.all(
+      dates.map(async (date) => {
+        try {
+          const response = await memberWorkoutsByDateRequest(memberId, date);
+          return { date, workouts: response.data.workouts };
+        } catch (error) {
+          // Devuelve vacío si falla
+          return { date, workouts: [] };
+        }
+      })
+    );
+
+    setWeeklyWorkouts(workoutsByDay);
+  } catch (error) {
+    console.error("Error al obtener los workouts del miembro:", error);
+    setWeeklyWorkouts([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
   const createWorkout = async (workoutData) => {
     try {
       setLoading(true);
@@ -87,7 +126,13 @@ export const WorkoutProvider = ({ children }) => {
   };
 
   return (
-    <WorkoutContext.Provider value={{ weeklyWorkouts, fetchWorkoutsByWeek, createWorkout, loading }}>
+    <WorkoutContext.Provider value={{
+      weeklyWorkouts,
+      fetchWorkoutsByWeek,
+      fetchMemberWorkoutsByWeek,
+      createWorkout,
+      loading
+    }}>
       {children}
     </WorkoutContext.Provider>
   );

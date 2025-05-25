@@ -22,6 +22,7 @@ import TrainerRoutinesPage from "./Pages/TrainerRoutinesPage";
 import EditUserPage from "./Pages/EditUserPage";
 import CreateGroupClassPage from "./Pages/CreateGrupalClassPage"; 
 import EditUserMember from "./Pages/EditUserMember";
+import MemberWorkoutPage from "./Pages/MemberWokoutPage";
 
 function App() {
   useEffect(() => {
@@ -52,6 +53,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
+            <Route path="/member-workouts-by-day/:memberId/:date" element={<MemberWorkoutPage />} />
             <Route path="/edit-user-member/:id" element={<EditUserMember />} />
             <Route path="/edit-workout/:workoutId" element={<EditWorkoutPage />} />
             <Route path="/profile-settings" element={<ProfilePageSettings />} />

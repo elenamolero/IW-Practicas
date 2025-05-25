@@ -29,11 +29,9 @@ const TrainerRoutinesPage = () => {
   );
 
   const handleModify = (memberId) => {
-    const today = new Date().toISOString().split("T")[0];
-    navigate(`/my-workouts-by-day/${today}`, {
-      state: { userId: memberId } 
-    });
-  };
+  const today = new Date().toISOString().split("T")[0];
+  navigate(`/member-workouts-by-day/${memberId}/${today}`);
+};
 
   return (
     <div className="min-h-screen bg-white text-black pt-20 px-6">

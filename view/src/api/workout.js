@@ -9,3 +9,14 @@ export const workoutRequest = (date, userId = null) => {
 
 export const createWorkoutRequest = (workoutData) =>
   axios.post("/create-workout", workoutData, { withCredentials: true });
+
+export const createWorkoutForMemberRequest = (workoutData, memberId) =>
+  axios.post(`/create-workout/${memberId}`, workoutData, {
+    withCredentials: true
+  });
+
+// Obtener los workouts de un miembro concreto en una fecha específica
+export const memberWorkoutsByDateRequest = (memberId, date) =>
+  axios.get(`/member-workouts-by-day/${memberId}/${date}`, {
+    withCredentials: true
+  });

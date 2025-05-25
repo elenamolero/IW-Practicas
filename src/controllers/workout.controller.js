@@ -2,6 +2,63 @@ import Workout from "../models/workout.model.js";
 import WorkoutType from "../models/workoutType.model.js";
 import User from "../models/user.model.js";
 
+export const getMemberWorkoutsByDate = async (req, res) => {
+  try {
+    const { memberId, date } = req.params;
+
+    if (!date) {
+      return res.status(400).json({
+        message: "La fecha es requerida en el formato YYYY-MM-DD.",
+      });
+    }
+
+    // Convertir la fecha proporcionada a un rango de inicio y fin del día
+    const startOfDay = new Date(date);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Obtener los workouts del miembro en el rango de la fecha especificada
+    const workouts = await Workout.find({
+      user_id: memberId,
+      date: { $gte: startOfDay, $lte: endOfDay },
+    })
+      .populate("workoutType_id", "title description")
+      .sort({ date: -1, order: 1 });
+
+    res.json({
+      message: "Workouts obtenidos exitosamente.",
+      workouts,
+    });
+  } catch (error) {
+    console.error("Error al obtener los workouts del miembro: ", error);
+    res.status(500).json({
+      message: "Error al obtener los workouts del miembro",
+      error: error.message,
+    });
+  }
+};
+
+export const createWorkoutForMember = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const member = await User.findById(memberId);
+    if (!member || member.role !== "member") {
+      return res.status(404).json({ message: "Miembro no encontrado" });
+    }
+
+    const workout = new Workout({
+      ...req.body,
+      user: memberId
+    });
+
+    await workout.save();
+
+    res.status(201).json(workout);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const createWorkout = async (req, res) => {
   try {
     const {

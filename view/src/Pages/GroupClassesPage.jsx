@@ -1,4 +1,3 @@
-// ...existing imports...
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGroupClass } from "../Context/GroupClassesContext";
@@ -23,7 +22,6 @@ const GroupClassesPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
 
-  // Loader solo para usuario
   if (authLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -90,28 +88,26 @@ const GroupClassesPage = () => {
     setTimeout(() => setMessage(null), 1900);
   };
 
-
-const handleDeleteClass = async (classId) => {
-  // Mostrar confirmación personalizada solo en producción
-  const isLocalhost =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-  let confirmDelete = true;
-  if (!isLocalhost) {
-    confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar esta clase grupal? Esta acción no se puede deshacer.");
-  }
-  if (!confirmDelete) return;
-  try {
-    await deleteGroupClass(classId);
-    setMessage("Clase eliminada con éxito");
-    setMessageType("success");
-    await fetchClassesByWeek(selectedDate);
-  } catch (error) {
-    setMessage(error.message || "Error al eliminar la clase");
-    setMessageType("error");
-  }
-  setTimeout(() => setMessage(null), 1900);
-};
+  const handleDeleteClass = async (classId) => {
+    const isLocalhost =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+    let confirmDelete = true;
+    if (!isLocalhost) {
+      confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar esta clase grupal? Esta acción no se puede deshacer.");
+    }
+    if (!confirmDelete) return;
+    try {
+      await deleteGroupClass(classId);
+      setMessage("Clase eliminada con éxito");
+      setMessageType("success");
+      await fetchClassesByWeek(selectedDate);
+    } catch (error) {
+      setMessage(error.message || "Error al eliminar la clase");
+      setMessageType("error");
+    }
+    setTimeout(() => setMessage(null), 1900);
+  };
 
   return (
     <div className="group-classes-page bg-white text-black min-h-screen p-6 pt-20">
@@ -187,7 +183,6 @@ const handleDeleteClass = async (classId) => {
                   navigate(`/group-class/${classId}/attendees/`);
                 };
 
-
                 return (
                   <div
                     key={groupClass._id}
@@ -216,7 +211,7 @@ const handleDeleteClass = async (classId) => {
                       <div className="flex gap-2 mt-4">
                         {/* Para entrenador */}
                         {user?.role === "trainer" && (
-  <>
+                          <>
                             <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs">
                               Modificar
                             </button>
@@ -231,12 +226,6 @@ const handleDeleteClass = async (classId) => {
                               onClick={() => handleShowAttendees(groupClass._id)}
                             >
                               Asistentes
-                            </button>
-                            <button
-                              className="fixed bottom-4 right-4 bg-blue-500 text-white p-4 rounded-full shadow-lg text-l"
-                              onClick={() => navigate("/create-group-class")}
-                            >
-                              + Añadir Clase
                             </button>
                           </>
                         )}
@@ -294,6 +283,15 @@ const handleDeleteClass = async (classId) => {
             </button>
           </div>
         </div>
+      )}
+      {/* Botón añadir clase siempre visible para entrenadores */}
+      {user?.role === "trainer" && (
+        <button
+          className="fixed bottom-4 right-4 bg-blue-500 text-white p-4 rounded-full shadow-lg text-l"
+          onClick={() => navigate("/create-group-class")}
+        >
+          + Añadir Clase
+        </button>
       )}
     </div>
   );
