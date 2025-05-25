@@ -110,9 +110,9 @@ export const register = async (req, res) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: true,
+      secure: true, 
       sameSite: 'Strict',
-      maxAge: 5* 60 * 1000
+      maxAge: 2 * 60 * 60 * 1000 // 2 horas
     });
 
     res.json({
@@ -142,12 +142,13 @@ export const login = async (req, res) => {
 
     const token = await createAccessToken({ id: userFound._id, role: userFound.role });
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'Strict',
-      maxAge:  5* 60 * 1000
-    });
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: true, 
+    sameSite: 'Strict',
+    maxAge: 2 * 60 * 60 * 1000 // 2 horas
+  });
+
 
     res.json({
       id: userFound._id,

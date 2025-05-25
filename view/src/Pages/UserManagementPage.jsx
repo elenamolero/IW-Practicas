@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaSearch, FaUserPlus } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import Navbar from "../Components/Navbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -10,14 +10,6 @@ function UserManagementPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user || user.role !== "trainer") {
-      alert("Acceso denegado");
-      navigate("/");
-    }
-  }, [navigate]);
-
-  useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await axios.get("http://localhost:4000/api/members", {
@@ -25,11 +17,16 @@ function UserManagementPage() {
         });
         setUsers(res.data);
       } catch (error) {
-        console.error("Error al obtener los usuarios:", error);
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+          alert("Acceso denegado");
+          navigate("/");
+        } else {
+          console.error("Error al obtener los usuarios:", error);
+        }
       }
     };
     fetchUsers();
-  }, []);
+  }, [navigate]);
 
   const filteredUsers = users.filter((user) =>
     user.email.toLowerCase().includes(searchEmail.toLowerCase())
