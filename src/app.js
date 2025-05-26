@@ -10,7 +10,6 @@ import muscleRoomRoutes from "./routes/muscleRoom.routes.js";
 import muscleRoomReserveRoutes from "./routes/muscleRoomReserve.routes.js";
 import cors from 'cors';
 
-
 const app=express();
 
 app.use(cors({
