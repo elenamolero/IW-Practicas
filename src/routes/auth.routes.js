@@ -12,7 +12,8 @@ import {
   getMemberWorkoutsByDate,
   getAllTrainers,
   updateUserMember,
-  getMemberById
+  getMemberById,
+  registerTrainerAsAdmin
 } from "../controllers/auth.controller.js";
 import { authRequired } from '../Middlewares/validateToken.js';
 import { validateSchema } from '../Middlewares/validator.middleware.js';
@@ -33,6 +34,13 @@ router.post(
   upload.single('photo'),
   validateSchema(registerSchema),
   register
+);
+router.post(
+  "/register-trainer",
+  authRequired,
+  requireRole(["trainer"]),
+  validateSchema(registerSchema),
+  registerTrainerAsAdmin
 );
 
 router.post(

@@ -327,3 +327,42 @@ export const getMemberWorkoutsByDate = async (req, res) => {
     res.status(500).json({ message: "Error al obtener workouts", error: error.message });
   }
 };
+
+// Registro para entrenadores
+export const registerTrainerAsAdmin = async (req, res) => {
+  try {
+    const {
+      email, password, firstName, lastName, phone, role,
+      photo, classesCanTeach
+    } = req.body;
+
+    const userFound = await User.findOne({ email });
+    if (userFound) return res.status(400).json(['El email ya está en uso']);
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      email,
+      password: passwordHash,
+      firstName,
+      lastName,
+      phone,
+      photo: photo || null,
+      role: "trainer",
+      classesCanTeach: Array.isArray(classesCanTeach) ? classesCanTeach : [],
+    });
+
+    const userSaved = await newUser.save();
+
+    res.json({
+      id: userSaved._id,
+      email: userSaved.email,
+      firstName: userSaved.firstName,
+      lastName: userSaved.lastName,
+      role: userSaved.role,
+      createdAt: userSaved.createdAt,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
