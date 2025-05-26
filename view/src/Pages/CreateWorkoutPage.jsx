@@ -13,6 +13,8 @@ function CreateWorkoutPage() {
   const [formData, setFormData] = useState({
     order: "",
     workoutTypeId: "",
+    workoutTypeTitle: "",
+    workoutTypeDescription: "",
     description: "",
     intensity: "",
     series: "",
@@ -21,6 +23,8 @@ function CreateWorkoutPage() {
     rest: "",
     date: ""
   });
+  
+  
 
   // Notificación bonita
   const [notification, setNotification] = useState({ show: false, message: "", type: "success" });
@@ -51,7 +55,10 @@ function CreateWorkoutPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ title: titleTrim, description: formData.description })
+      body: JSON.stringify({ 
+        title: titleTrim, 
+        description: formData.workoutTypeDescription 
+      })
     });
     const data = await res.json();
     if (res.ok && data.workoutType && data.workoutType._id) {
@@ -71,14 +78,14 @@ function CreateWorkoutPage() {
       return setNotification({ show: true, message: "La fecha debe ser actual o futura", type: "error" });
 
     try {
-      const newWorkoutTypeId = await createWorkoutTypeAndGetId(formData.workoutTypeId);
+      const newWorkoutTypeId = await createWorkoutTypeAndGetId(formData.workoutTypeTitle);
 
       // Forzar la fecha a ser solo día (sin hora)
       const dateOnly = formData.date.split("T")[0];
       const workoutToSend = {
         order: Number(formData.order),
         workoutTypeId: newWorkoutTypeId,
-        description: formData.description,
+        description: formData.workoutTypeDescription,
         intensity: Number(formData.intensity),
         series: Number(formData.series),
         repetitions: Number(formData.repetitions),
@@ -150,7 +157,7 @@ function CreateWorkoutPage() {
 
       <div className="z-10 w-full max-w-2xl px-4 py-16">
         <h1 className="text-4xl md:text-5xl font-semibold tracking-wider text-center mb-14">
-          Modificar ejercicio
+          Añadir ejercicio
         </h1>
 
         <form
@@ -195,7 +202,7 @@ function CreateWorkoutPage() {
               <FaInfoCircle className="absolute right-6 top-1/2 -translate-y-1/2 text-[#072F5D]" />
             </div>
             <p className="text-right text-sm font-medium text-[#072F5D]">
-              {formData.workoutTypeDescription.length}/200 caracteres
+              {formData.workoutTypeDescription?.length}/200 caracteres
             </p>
           </div>
 
@@ -282,7 +289,7 @@ function CreateWorkoutPage() {
               type="submit"
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold text-lg px-12 py-4 rounded-full transition"
             >
-              GUARDAR CAMBIOS
+              AGREGAR EJERCICIO
             </button>
           </div>
         </form>
