@@ -50,6 +50,39 @@ export const createMuscleRoomReserve = async (req, res) => {
       });
     }
 
+    // Validar que la reserva no sea en el pasado y solo se pueda reservar con máximo 48h de antelación
+    const now = new Date();
+    const reserveDateTime = new Date(`${date}T${startTime}`);
+    const diffMs = reserveDateTime - now;
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    if (diffHours < 0) {
+      return res.status(400).json({
+        message: "No se puede reservar en el pasado"
+      });
+    }
+    if (diffHours > 48) {
+      return res.status(400).json({
+        message: "Solo se puede reservar con un máximo de 48 horas de antelación"
+      });
+    }
+
+    // Verificar si ya hay una reserva activa en ese horario para esa sala
+    const maxReservations = 200; 
+    const currentReservations = await MuscleRoomReserve.countDocuments({
+      muscleRoom,
+      date,
+      startTime: { $lte: endTime },
+      endTime: { $gt: startTime },
+      status: { $ne: 'cancelled' }
+    });
+
+    if (currentReservations >= maxReservations) {
+      return res.status(400).json({
+        message: "No hay plazas disponibles para esta sala y horario"
+      });
+    }
+
     // Verificar si el usuario ya tiene una reserva en el mismo horario
     const existingReserve = await MuscleRoomReserve.findOne({
       user: userId,
