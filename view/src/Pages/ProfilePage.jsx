@@ -87,7 +87,7 @@ function ProfilePage() {
               <div>
                 <h2 className="text-xl font-semibold">AFORO ACTUAL RESERVADO</h2>
                 <p className="text-3xl font-bold">{currentGymReservations} socios</p>
-                <p className="text-sm text-red-600 mt-1">*aforo máx. 200 personas</p>
+                <p className="text-sm text-red-600 mt-1">*aforo sala musculación máx. 200 personas</p>
               </div>
             </div>
   

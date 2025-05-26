@@ -19,11 +19,12 @@ function MuscleRoomPage() {
   });
   const [editingReservation, setEditingReservation] = useState(null);
   const [editForm, setEditForm] = useState({
-  date: "",
-  startTime: "",
-  endTime: "",
-  notes: ""
+    date: "",
+    startTime: "",
+    endTime: "",
+    notes: ""
   });
+  const [reserveError, setReserveError] = useState(""); // NUEVO
 
   useEffect(() => {
     fetchReservations();
@@ -32,14 +33,14 @@ function MuscleRoomPage() {
 
   const handleDeleteReserve = async (reserveId) => {
     if (!window.confirm("¿Estás seguro de que quieres cancelar esta reserva?")) return;
-  
+
     try {
       await axios.delete(`http://localhost:4000/api/muscle-room-reserves/${reserveId}`, {
         withCredentials: true,
       });
       alert("Reserva cancelada correctamente");
-      fetchReservations(); // recarga la lista
-      setFilteredReserves((prev) => prev.filter((r) => r._id !== reserveId)); // opcional: elimina visualmente sin volver a buscar
+      fetchReservations();
+      setFilteredReserves((prev) => prev.filter((r) => r._id !== reserveId));
     } catch (error) {
       alert(error.response?.data?.message || "Error al cancelar la reserva");
     }
@@ -54,7 +55,7 @@ function MuscleRoomPage() {
       notes: res.notes || ""
     });
   };
-  
+
   const handleUpdateReserve = async () => {
     try {
       await axios.put(
@@ -70,7 +71,6 @@ function MuscleRoomPage() {
     }
   };
 
-  
   const fetchMuscleRooms = async () => {
     try {
       const res = await axios.get("http://localhost:4000/api/muscle-rooms", {
@@ -81,7 +81,6 @@ function MuscleRoomPage() {
       console.error("Error al obtener las salas de musculación:", error);
     }
   };
-  
 
   const fetchReservations = async () => {
     try {
@@ -95,37 +94,42 @@ function MuscleRoomPage() {
   };
 
   const handleReserve = async () => {
+    setReserveError(""); // Limpia el error anterior
     try {
-        const muscleRoomId = newReservation.muscleRoom;
-    
-        await axios.post("http://localhost:4000/api/create-muscle-room-reserve", {
-          muscleRoom: muscleRoomId,
-          date: newReservation.date,
-          startTime: newReservation.startTime,
-          endTime: newReservation.endTime,
-          notes: newReservation.notes
-        }, {
-          withCredentials: true
-        });
-    
-        alert("Reserva realizada correctamente");
-        fetchReservations();
-        setNewReservation({ date: "", startTime: "", endTime: "", notes: "" });
-      } catch (error) {
-        alert(error.response?.data?.message || "Error al crear la reserva");
-      }
+      const muscleRoomId = newReservation.muscleRoom;
+
+      await axios.post("http://localhost:4000/api/create-muscle-room-reserve", {
+        muscleRoom: muscleRoomId,
+        date: newReservation.date,
+        startTime: newReservation.startTime,
+        endTime: newReservation.endTime,
+        notes: newReservation.notes
+      }, {
+        withCredentials: true
+      });
+
+      setReserveError(""); // Limpia el error si todo va bien
+      fetchReservations();
+      setNewReservation({ date: "", startTime: "", endTime: "", notes: "" });
+    } catch (error) {
+      const msg = error.response?.data?.message || "Error al crear la reserva";
+      setReserveError(
+        msg.includes("48 horas")
+          ? "Solo puedes reservar con un máximo de 48 horas de antelación."
+          : msg.includes("No hay plazas disponibles")
+          ? "No hay plazas disponibles para esta sala y horario."
+          : msg.includes("No se puede reservar en el pasado")
+          ? "No puedes reservar en el pasado."
+          : msg
+      );
+    }
   };
 
   const handleSearch = () => {
     const results = reservations.filter((res) => {
       const matchDate = searchDate ? res.date.includes(searchDate) : true;
-
-      const matchStart =
-        searchStartTime ? res.startTime >= searchStartTime : true;
-
-      const matchEnd =
-        searchEndTime ? res.startTime <= searchEndTime : true;
-
+      const matchStart = searchStartTime ? res.startTime >= searchStartTime : true;
+      const matchEnd = searchEndTime ? res.startTime <= searchEndTime : true;
       return matchDate && matchStart && matchEnd;
     });
 
@@ -142,7 +146,7 @@ function MuscleRoomPage() {
         </h1>
 
         <p className="text-xl text-center text-gray-700 mb-10">
-          Debido además al COVID-19, la entrada de miembros al gimnasio está limitada por aforo según las instituciones públicas, por lo que el aforo de la sala de musculación no puede superar los 170. Se podrá reservar con 48 horas de antelación.
+          Debido además al COVID-19, la entrada de miembros al gimnasio está limitada por aforo según las instituciones públicas, por lo que el aforo de la sala de musculación no puede superar los 200. Se podrá reservar con 48 horas de antelación.
         </p>
 
         {/* Buscador de reservas */}
@@ -230,23 +234,29 @@ function MuscleRoomPage() {
         {/* Nueva reserva */}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold text-center mb-4">Nueva Reserva</h2>
+          {/* Notificación de error */}
+          {reserveError && (
+            <div className="bg-red-100 text-red-700 rounded-xl px-4 py-2 mb-4 text-center font-semibold">
+              {reserveError}
+            </div>
+          )}
           <div className="bg-blue-100 rounded-3xl p-6 space-y-4">
             <div className="relative">
-            <label className="block text-sm font-semibold mb-1">Sala de Musculación</label>
-            <select
-            className="w-full rounded-full px-4 py-2"
-            value={newReservation.muscleRoom || ""}
-            onChange={(e) =>
-              setNewReservation({ ...newReservation, muscleRoom: e.target.value })
-            }
-            >
-            <option value="">Selecciona una sala</option>
+              <label className="block text-sm font-semibold mb-1">Sala de Musculación</label>
+              <select
+                className="w-full rounded-full px-4 py-2"
+                value={newReservation.muscleRoom || ""}
+                onChange={(e) =>
+                  setNewReservation({ ...newReservation, muscleRoom: e.target.value })
+                }
+              >
+                <option value="">Selecciona una sala</option>
                 {muscleRooms.map((room) => (
-            <option key={room._id} value={room._id}>
-            {room.name}
-            </option>
-            ))}
-            </select>   
+                  <option key={room._id} value={room._id}>
+                    {room.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-semibold mb-1">Fecha</label>
@@ -298,61 +308,61 @@ function MuscleRoomPage() {
           </div>
         </section>
         {editingReservation && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div className="bg-white p-8 rounded-xl w-full max-w-md">
-      <h3 className="text-2xl font-bold mb-4">Modificar Reserva</h3>
-      <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-semibold mb-1">Fecha</label>
-        <input
-            type="date"
-            className="w-full rounded-full px-4 py-2"
-            value={
-                editForm.date
-            ? new Date(editForm.date).toISOString().split("T")[0]
-            : ""
-            }
-            onChange={(e) =>
-            setEditForm({ ...editForm, date: e.target.value })
-        }
-        />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Hora Inicio</label>
-          <input
-            type="time"
-            className="w-full rounded-full px-4 py-2"
-            value={editForm.startTime}
-            onChange={(e) => setEditForm({ ...editForm, startTime: e.target.value })}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold mb-1">Hora Fin</label>
-          <input
-            type="time"
-            className="w-full rounded-full px-4 py-2"
-            value={editForm.endTime}
-            onChange={(e) => setEditForm({ ...editForm, endTime: e.target.value })}
-          />
-        </div>
-      </div>
-      <div className="flex justify-end mt-6 gap-4">
-        <button
-          onClick={() => setEditingReservation(null)}
-          className="px-6 py-2 bg-gray-300 hover:bg-gray-400 rounded-full"
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={handleUpdateReserve}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
-        >
-          Guardar Cambios
-        </button>
-        </div>
-      </div>
-    </div>
-    )}
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-8 rounded-xl w-full max-w-md">
+              <h3 className="text-2xl font-bold mb-4">Modificar Reserva</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Fecha</label>
+                  <input
+                    type="date"
+                    className="w-full rounded-full px-4 py-2"
+                    value={
+                      editForm.date
+                        ? new Date(editForm.date).toISOString().split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, date: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Hora Inicio</label>
+                  <input
+                    type="time"
+                    className="w-full rounded-full px-4 py-2"
+                    value={editForm.startTime}
+                    onChange={(e) => setEditForm({ ...editForm, startTime: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Hora Fin</label>
+                  <input
+                    type="time"
+                    className="w-full rounded-full px-4 py-2"
+                    value={editForm.endTime}
+                    onChange={(e) => setEditForm({ ...editForm, endTime: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end mt-6 gap-4">
+                <button
+                  onClick={() => setEditingReservation(null)}
+                  className="px-6 py-2 bg-gray-300 hover:bg-gray-400 rounded-full"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleUpdateReserve}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
+                >
+                  Guardar Cambios
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
